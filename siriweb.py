@@ -120,33 +120,33 @@ def Matlista():
 		else:
 			newOtherList.append(x)
 	
-	finalList = []
+	tmpList = []
 
 	for x in newListBread:
-		finalList.append(x)
+		tmpList.append(x)
 	for x in newListDairies:
-		finalList.append(x)
+		tmpList.append(x)
 	for x in newListSpices:
-		finalList.append(x)
+		tmpList.append(x)
 	for x in newListFrozen:
-		finalList.append(x)
+		tmpList.append(x)
 	for x in newListVegos:
-		finalList.append(x)
+		tmpList.append(x)
 	for x in newListCheese:
-		finalList.append(x)
+		tmpList.append(x)
 	for x in newListPasta:
-		finalList.append(x)
+		tmpList.append(x)
 	for x in newListCheckout:
-		finalList.append(x)
+		tmpList.append(x)
 	for x in newOtherList:
-		finalList.append(x)
+		tmpList.append(x)
 
-	duplicates = [item for item, count in collections.Counter(finalList).items() if count > 1]
+	duplicates = [item for item, count in collections.Counter(tmpList).items() if count > 1]
 
 	duplicatesIndexList = []
 
 	for i in range(len(duplicates)):
-		duplicatesIndexList.append(indices(finalList, duplicates[i]))
+		duplicatesIndexList.append(indices(tmpList, duplicates[i]))
 
 	numberOfDuplicatesList = []
 	indexToRemoveList = []
@@ -158,39 +158,39 @@ def Matlista():
 		firstIndexList.append(duplicatesIndexList[i][0])
 
 	for i in range(len(firstIndexList)):
-		finalList[firstIndexList[i]] = str(numberOfDuplicatesList[i]) + " x " + str(finalList[firstIndexList[i]])
+		tmpList[firstIndexList[i]] = str(numberOfDuplicatesList[i]) + " x " + str(tmpList[firstIndexList[i]])
 	
 	for i in range(len(duplicates)):
-		finalList.remove(duplicates[i])
+		tmpList.remove(duplicates[i])
 	
 
 
-	# print("FINAL LIST AFTER: ", finalList)
-	# print("FINAL LIST AFTER LENGTH: ", len(finalList))
+	# print("FINAL LIST AFTER: ", tmpList)
+	# print("FINAL LIST AFTER LENGTH: ", len(tmpList))
 
 
 	# # check for subsets
-	# for i in range(len(finalList)):
-	# 	for j in range(len(finalList)):
+	# for i in range(len(tmpList)):
+	# 	for j in range(len(tmpList)):
 	# 		if i==j: continue # same index
-	# 		if (set(finalList[i].split()) & set(finalList[j].split())) == set(finalList[i].split()): # if subset
-	# 			print("FOUND DUPLICATE PART: ", finalList[i], "INDEX: ", i, "CORRESPONDING POS: ", j)
-	# 			finalList[i]="" # clear string
+	# 		if (set(tmpList[i].split()) & set(tmpList[j].split())) == set(tmpList[i].split()): # if subset
+	# 			print("FOUND DUPLICATE PART: ", tmpList[i], "INDEX: ", i, "CORRESPONDING POS: ", j)
+	# 			tmpList[i]="" # clear string
 
 	# # a = [x for x in a if len(x)]  # remove empty strings
 
 	# b = []
-	# for x in finalList:  # each string in a
+	# for x in tmpList:  # each string in a
 	# 	if len(x) > 0: # if not empty
 	# 		b.append(x)  # add to final list  
 
-	# finalList = b
+	# tmpList = b
     
 
-	superFinalList = []
-	for x in finalList:
-		superFinalList.append(x)
-		superFinalList.append("False")
+	finalList = []
+	for x in tmpList:
+		finalList.append(x)
+		finalList.append("False")
 
 
 	now = datetime.now() # current date and time	
@@ -214,7 +214,7 @@ def Matlista():
 
 	match = veckodag + " " + date_time
 
-	lst_tuple_grocery = [x for x in zip(*[iter(superFinalList)]*2)]
+	lst_tuple_grocery = [x for x in zip(*[iter(finalList)]*2)]
 	dish_list_tuple = [x for x in zip(*[iter(dishList)]*2)]
 
 	gnotes = keep.all()
