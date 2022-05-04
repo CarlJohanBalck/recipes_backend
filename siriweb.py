@@ -37,8 +37,6 @@ app = Flask(__name__)
 print('\n Hostname of your Pi: ' + hostname)
 print(' IP address of Pi: ' + ip_address)
 
-
-
 @app.route('/Siri/Senast', methods=['GET'])
 def LiloSenast():
 	config = configparser.ConfigParser()
