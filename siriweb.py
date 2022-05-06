@@ -20,7 +20,6 @@ import pytz
 from config import (
 	IP_ADDRESS,
 	PORT,
-	MY_DATES,
 	RECEPIES,
 	KEEP_EMAIL,
 	KEEP_PASSWORD,
@@ -230,20 +229,20 @@ def Matlista():
 	lst_tuple_grocery = [x for x in zip(*[iter(finalList)]*2)]
 	dish_list_tuple = [x for x in zip(*[iter(dishList)]*2)]
 
-	gnotes = keep.all()
-	for i in range(len(gnotes)):
-		if gnotes[i].title == "Inköpslista PI" or gnotes[i].title == "Matlista PI":
-			gnotes[i].delete()
+	# gnotes = keep.all()
+	# for i in range(len(gnotes)):
+	# 	if gnotes[i].title == "Inköpslista PI" or gnotes[i].title == "Matlista PI":
+	# 		gnotes[i].delete()
 	
-	glist = keep.createList('Inköpslista PI - ' + match, 
-		lst_tuple_grocery
-	)
-	glist = keep.createList('Matlista PI - ' + match, 
-		dish_list_tuple
-	)
+	# glist = keep.createList('Inköpslista PI - ' + match, 
+	# 	lst_tuple_grocery
+	# )
+	# glist = keep.createList('Matlista PI - ' + match, 
+	# 	dish_list_tuple
+	# )
 
-	# Sync up changes
-	keep.sync()
+	# # Sync up changes
+	# keep.sync()
 
 	return "Jag har nu gjort en inköpslista i Google Keep. Det är " + str(nbrDishesPerWeek) + " av " + str(nbrRecepies) + " recept totalt"
 
@@ -320,6 +319,18 @@ def PromenadSummary():
 def first2(s):
     return s[:2]
 
+def getEverySecondDateInFuture(date):
+	parsedDate = datetime.strptime(date, "%d/%m/%Y").date()
+	dateList = []
+	for i in range (20):
+		td = timedelta(days=i+2)
+		dishDayTmp = parsedDate + td
+		futureMedicationDates = dishDayTmp.strftime("%d/%m/%Y")	
+		dateList.append(futureMedicationDates)
+	everyOtherDateList = dateList[::2]
+	return everyOtherDateList
+
+
 @app.route('/Siri/LiloStatus', methods=['GET'])
 def LiloStatus():
 	config = configparser.ConfigParser()
@@ -329,6 +340,10 @@ def LiloStatus():
 	my_date = date.today()
 	sense = SenseHat()
 	weekday = calendar.day_name[my_date.weekday()]
+	last_date = config['DEFAULT']['LAST_DATE']
+	last_date_parsed = last_date.split(" ")[1]
+	futureMedicationDates = getEverySecondDateInFuture(last_date_parsed)
+
 	if(weekday == "Sunday"):
 		veckodag = "Söndag"
 	if(weekday == "Monday"):
@@ -343,13 +358,13 @@ def LiloStatus():
 		veckodag = "Fredag"
 	if(weekday == "Saturday"):
 		veckodag = "Lördag"
-	# testVar = json.loads(config.get("DEFAULT","my_dates"))
+	# testVar = json.loads(config.get("DEFAULT","futureMedicationDates"))
 	# print("test var", testVar)
 	match = veckodag + " " + date_time
-	if (match == config['DEFAULT']['LAST_DATE'] and date_time in MY_DATES):
+	if (match == config['DEFAULT']['LAST_DATE'] and date_time in futureMedicationDates):
 		return "Idag ska Lilo få medicin, men jag har redan skrivit upp att hon fått medicin idag " + config['DEFAULT']['LAST_DATE']
 		
-	if date_time in MY_DATES: 
+	if date_time in futureMedicationDates: 
 		r = 0
 		g = 255
 		b = 0
