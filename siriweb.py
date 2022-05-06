@@ -12,6 +12,10 @@ import random
 import gkeepapi
 import re
 import collections
+from icalendar import Calendar, Event, vCalAddress, vText
+from pathlib import Path
+import os
+import pytz
 
 from config import (
 	IP_ADDRESS,
@@ -67,23 +71,19 @@ def Matlista():
 	keep = gkeepapi.Keep()
 	success = keep.login(KEEP_EMAIL, KEEP_PASSWORD)
 	dishList = []
+	dishListTmp = []
 	groceryList = []
 	
 	for i in range(0,nbrDishesPerWeek):
 		final_recepie.append(recept[randomlist[i]])
-	f= open("matlista_dishes.txt","w+")
 	for i in range(nbrDishesPerWeek):
-		f.write(final_recepie[i][0] + "\n")
 		dishList.append(str(final_recepie[i][0]))
 		dishList.append("False")
-	f.close()
-	f= open("matlista_ingredients.txt","w+")
+		dishListTmp.append(str(final_recepie[i][0]))
 
 	for i in range(nbrDishesPerWeek):
 		for j in range(len(final_recepie[i])-1):
-			f.write(str(final_recepie[i][j+1]) + "\n")
 			groceryList.append(str(final_recepie[i][j+1]))
-	f.close()
 
 	newListBread = []
 	newListDairies = []
@@ -117,7 +117,6 @@ def Matlista():
 			newListCheckout.append(x)
 		else:
 			newOtherList.append(x)
-	
 	tmpList = []
 
 	for x in newListBread:
@@ -161,30 +160,6 @@ def Matlista():
 	for i in range(len(duplicates)):
 		tmpList.remove(duplicates[i])
 	
-
-
-	# print("FINAL LIST AFTER: ", tmpList)
-	# print("FINAL LIST AFTER LENGTH: ", len(tmpList))
-
-
-	# # check for subsets
-	# for i in range(len(tmpList)):
-	# 	for j in range(len(tmpList)):
-	# 		if i==j: continue # same index
-	# 		if (set(tmpList[i].split()) & set(tmpList[j].split())) == set(tmpList[i].split()): # if subset
-	# 			print("FOUND DUPLICATE PART: ", tmpList[i], "INDEX: ", i, "CORRESPONDING POS: ", j)
-	# 			tmpList[i]="" # clear string
-
-	# # a = [x for x in a if len(x)]  # remove empty strings
-
-	# b = []
-	# for x in tmpList:  # each string in a
-	# 	if len(x) > 0: # if not empty
-	# 		b.append(x)  # add to final list  
-
-	# tmpList = b
-    
-
 	finalList = []
 	for x in tmpList:
 		finalList.append(x)
@@ -194,6 +169,46 @@ def Matlista():
 	now = datetime.now() # current date and time	
 	date_time = now.strftime("%d/%m/%Y")	
 	my_date = date.today()
+	dishDays = []
+
+	for i in range(nbrDishesPerWeek):
+		td = timedelta(days=i+1)
+		dishDayTmp = now + td
+		dishDay = dishDayTmp.strftime("%d/%m/%Y")	
+		dishDays.append(str(dishDay))
+
+	dishDayList = list(zip(dishDays, dishListTmp))
+	#init the calendar
+	cal = Calendar()
+	# Some properties are required to be compliant
+	cal.add('prodid', '-//My calendar product//example.com//')
+	cal.add('version', '2.0')
+
+	for i in range(len(dishDayList)):
+		# Add subcomponents
+		event = Event()
+		t = 0
+		n = 1 # N. . .
+		dishes = [x[n] for x in dishDayList]
+		days = [x[t] for x in dishDayList]
+		dateTmp = [int(d) for d in str(days[i]).split('/') if d.isdigit()]
+		event.add('summary', dishes[i])
+		event.add('dtstart', datetime(dateTmp[2], dateTmp[1], dateTmp[0], 16, 0, 0, tzinfo=pytz.utc))
+		event.add('dtend', datetime(dateTmp[2], dateTmp[1], dateTmp[0], 17, 0, 0, tzinfo=pytz.utc))
+		cal.add_component(event)
+	#Write to disk
+	directory = Path.cwd() / 'DishListCal'
+	try:
+   		directory.mkdir(parents=True, exist_ok=False)
+	except FileExistsError:
+   		print("Folder already exists")
+	else:
+   		print("Folder was created")
+ 
+	f = open(os.path.join(directory, 'dishlist.ics'), 'wb')
+	f.write(cal.to_ical())
+	f.close()
+
 	weekday = calendar.day_name[my_date.weekday()]
 	if(weekday == "Sunday"):
 		veckodag = "Söndag"
