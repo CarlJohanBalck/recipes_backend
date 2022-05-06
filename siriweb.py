@@ -229,20 +229,20 @@ def Matlista():
 	lst_tuple_grocery = [x for x in zip(*[iter(finalList)]*2)]
 	dish_list_tuple = [x for x in zip(*[iter(dishList)]*2)]
 
-	# gnotes = keep.all()
-	# for i in range(len(gnotes)):
-	# 	if gnotes[i].title == "Inköpslista PI" or gnotes[i].title == "Matlista PI":
-	# 		gnotes[i].delete()
+	gnotes = keep.all()
+	for i in range(len(gnotes)):
+		if gnotes[i].title == "Inköpslista PI" or gnotes[i].title == "Matlista PI":
+			gnotes[i].delete()
 	
-	# glist = keep.createList('Inköpslista PI - ' + match, 
-	# 	lst_tuple_grocery
-	# )
-	# glist = keep.createList('Matlista PI - ' + match, 
-	# 	dish_list_tuple
-	# )
+	glist = keep.createList('Inköpslista PI - ' + match, 
+		lst_tuple_grocery
+	)
+	glist = keep.createList('Matlista PI - ' + match, 
+		dish_list_tuple
+	)
 
-	# # Sync up changes
-	# keep.sync()
+	# Sync up changes
+	keep.sync()
 
 	return "Jag har nu gjort en inköpslista i Google Keep. Det är " + str(nbrDishesPerWeek) + " av " + str(nbrRecepies) + " recept totalt"
 
@@ -324,8 +324,8 @@ def getEverySecondDateInFuture(date):
 	dateList = []
 	for i in range (20):
 		td = timedelta(days=i+2)
-		dishDayTmp = parsedDate + td
-		futureMedicationDates = dishDayTmp.strftime("%d/%m/%Y")	
+		futureDate = parsedDate + td
+		futureMedicationDates = futureDate.strftime("%d/%m/%Y")	
 		dateList.append(futureMedicationDates)
 	everyOtherDateList = dateList[::2]
 	return everyOtherDateList
