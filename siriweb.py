@@ -59,22 +59,38 @@ def LiloSenast():
 def indices(lst, item):
 	return [i for i, x in enumerate(lst) if x == item]
 
+
 @app.route('/Siri/Matlista', methods=['GET'])
 def Matlista():	
-	randomlist = []
 	recept = RECEPIES
-	nbrDishesPerWeek = 5
+	weekday = 4
+	weekend = 1
+	nbrDishesPerWeek = weekday + weekend
 	nbrRecepies = len(recept)
 	final_recepie = []
-	randomlist = random.sample(range(nbrRecepies), nbrDishesPerWeek)
 	keep = gkeepapi.Keep()
 	success = keep.login(KEEP_EMAIL, KEEP_PASSWORD)
 	dishList = []
 	dishListTmp = []
 	groceryList = []
+	weekday_list = []
+	weekend_list = []
+
+	for i in range (len(recept)):
+		if recept[i][0][-1] == "h":
+			weekend_list.append(recept[i])
+		elif recept[i][0][-1] == "v":
+			weekday_list.append(recept[i])
+
+	randomlist_weekday = random.sample(range(len(weekday_list)), weekday)
+	randomlist_weekend = random.sample(range(len(weekend_list)), weekend)
+
+	for i in range(0,weekday):
+			final_recepie.append(weekday_list[randomlist_weekday[i]])
+	for i in range(0,weekend):
+			final_recepie.append(weekend_list[randomlist_weekend[i]])
 	
-	for i in range(0,nbrDishesPerWeek):
-		final_recepie.append(recept[randomlist[i]])
+
 	for i in range(nbrDishesPerWeek):
 		dishList.append(str(final_recepie[i][0]))
 		dishList.append("False")
@@ -198,7 +214,7 @@ def Matlista():
 	#Write to disk
 	directory = Path.cwd() / 'DishListCal'
 	try:
-   		directory.mkdir(parents=True, exist_ok=False)
+   		directory.mkdir(parents=True, exist_ok=True)
 	except FileExistsError:
    		print("Folder already exists")
 	else:
@@ -228,10 +244,11 @@ def Matlista():
 
 	lst_tuple_grocery = [x for x in zip(*[iter(finalList)]*2)]
 	dish_list_tuple = [x for x in zip(*[iter(dishList)]*2)]
-
 	gnotes = keep.all()
+	string_ingredients = 'Inköpslista PI - ' + match
+	string_dishes = 'Matlista PI - ' + match
 	for i in range(len(gnotes)):
-		if gnotes[i].title == "Inköpslista PI" or gnotes[i].title == "Matlista PI":
+		if gnotes[i].title == string_ingredients or gnotes[i].title == string_dishes:
 			gnotes[i].delete()
 	
 	glist = keep.createList('Inköpslista PI - ' + match, 
