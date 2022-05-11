@@ -92,10 +92,10 @@ def Matlista():
 	
 
 	for i in range(nbrDishesPerWeek):
-		dishList.append(str(final_recepie[i][0]))
+		dishList.append(str(final_recepie[i][0][:-2]))
 		dishList.append("False")
 		dishListTmp.append(str(final_recepie[i][0]))
-
+	
 	for i in range(nbrDishesPerWeek):
 		for j in range(len(final_recepie[i])-1):
 			groceryList.append(str(final_recepie[i][j+1]))
@@ -244,6 +244,7 @@ def Matlista():
 
 	lst_tuple_grocery = [x for x in zip(*[iter(finalList)]*2)]
 	dish_list_tuple = [x for x in zip(*[iter(dishList)]*2)]
+
 	gnotes = keep.all()
 	string_ingredients = 'Inköpslista PI - ' + match
 	string_dishes = 'Matlista PI - ' + match
