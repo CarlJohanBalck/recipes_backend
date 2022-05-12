@@ -68,8 +68,8 @@ def Matlista():
 	nbrDishesPerWeek = weekday + weekend
 	nbrRecepies = len(recept)
 	final_recepie = []
-	keep = gkeepapi.Keep()
-	success = keep.login(KEEP_EMAIL, KEEP_PASSWORD)
+	# keep = gkeepapi.Keep()
+	# success = keep.login(KEEP_EMAIL, KEEP_PASSWORD)
 	dishList = []
 	dishListTmp = []
 	groceryList = []
@@ -245,24 +245,35 @@ def Matlista():
 	lst_tuple_grocery = [x for x in zip(*[iter(finalList)]*2)]
 	dish_list_tuple = [x for x in zip(*[iter(dishList)]*2)]
 
-	gnotes = keep.all()
-	string_ingredients = 'Inköpslista PI - ' + match
-	string_dishes = 'Matlista PI - ' + match
-	for i in range(len(gnotes)):
-		if gnotes[i].title == string_ingredients or gnotes[i].title == string_dishes:
-			gnotes[i].delete()
+	f = open("grocerylist.txt", "w")
+	for i in range (len(finalList[::2])):
+		f.write(finalList[::2][i] + "\n")
+	f.close()
+	t = open("dishlist.txt", "w")
+	for i in range (len(dishList[::2])):
+		t.write(dishList[::2][i] + "\n")
+	t.close()
+
+	# gnotes = keep.all()
+	# string_ingredients = 'Inköpslista PI - ' + match
+	# string_dishes = 'Matlista PI - ' + match
+	# for i in range(len(gnotes)):
+	# 	if gnotes[i].title == string_ingredients or gnotes[i].title == string_dishes:
+	# 		gnotes[i].delete()
 	
-	glist = keep.createList('Inköpslista PI - ' + match, 
-		lst_tuple_grocery
-	)
-	glist = keep.createList('Matlista PI - ' + match, 
-		dish_list_tuple
-	)
+	# glist = keep.createList('Inköpslista PI - ' + match, 
+	# 	lst_tuple_grocery
+	# )
+	# glist = keep.createList('Matlista PI - ' + match, 
+	# 	dish_list_tuple
+	# )
 
-	# Sync up changes
-	keep.sync()
-
-	return "Jag har nu gjort en inköpslista i Google Keep. Det är " + str(nbrDishesPerWeek) + " av " + str(nbrRecepies) + " recept totalt"
+	# # Sync up changes
+	# keep.sync()
+	dishesSummary = ""
+	for i in range (len(dishList[::2])):
+		dishesSummary += str(re.sub(r"\([^()]*\)","", dishList[::2][i])) + ", "
+	return "Denna vecka blir det " + dishesSummary
 
 @app.route('/Siri/AntalPromenader', methods=['GET'])
 def LiloAntalPromendater():
