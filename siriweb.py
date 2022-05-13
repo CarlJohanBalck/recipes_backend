@@ -2,6 +2,7 @@ import os
 import time
 from datetime import datetime, date, timedelta
 from flask import Flask, request
+from flask_cors import CORS
 import socket
 import time
 from timer import Timer
@@ -16,6 +17,7 @@ from icalendar import Calendar, Event, vCalAddress, vText
 from pathlib import Path
 import os
 import pytz
+import json
 
 from config import (
 	IP_ADDRESS,
@@ -34,8 +36,10 @@ from config import (
 )
 hostname = socket.gethostname()
 isOnWalk = False
+
 ip_address = IP_ADDRESS
 app = Flask(__name__)
+CORS(app)
 
 print('\n Hostname of your Pi: ' + hostname)
 print(' IP address of Pi: ' + ip_address)
@@ -59,12 +63,21 @@ def LiloSenast():
 def indices(lst, item):
 	return [i for i, x in enumerate(lst) if x == item]
 
+@app.route('/Siri/Recepies', methods=['GET'])
+def getRecepies():
+	recepies = RECEPIES
+	# for i in range(len(recepies)):
+	# 	recepies[i][0] = str(re.sub(r"\([^()]*\)","", recepies[i][0]))
+	# 	recepies[i][0] = recepies[i][0][:-2]
+			
+		
+	return json.dumps(list(recepies))
 
 @app.route('/Siri/Matlista', methods=['GET'])
 def Matlista():	
 	recept = RECEPIES
-	weekday = 4
-	weekend = 1
+	weekday = 3
+	weekend = 2
 	nbrDishesPerWeek = weekday + weekend
 	nbrRecepies = len(recept)
 	final_recepie = []
@@ -96,6 +109,7 @@ def Matlista():
 		dishList.append("False")
 		dishListTmp.append(str(final_recepie[i][0]))
 	
+
 	for i in range(nbrDishesPerWeek):
 		for j in range(len(final_recepie[i])-1):
 			groceryList.append(str(final_recepie[i][j+1]))
@@ -331,6 +345,163 @@ def LiloPromenad():
 		current_walk_time = int(config.get("DEFAULT", "current_walk_time"))
 		conversion = str(timedelta(seconds=current_walk_time))
 		return "Totalt tid ute denna promenad med Lilo var: " + conversion
+
+@app.route('/Siri/ReactRecepies', methods=['POST'])
+def ReactRecepies():
+		data = request.json
+		recepies = data.get("list")
+		dishList = []
+		dishListTmp = []
+		groceryList = []
+		for i in range(len(recepies)):
+			dishList.append(str(recepies[i][0][:-2]))
+			dishListTmp.append(str(recepies[i][0]))
+	
+		for i in range(len(recepies)):
+			for j in range(len(recepies[i])-1):
+				groceryList.append(str(recepies[i][j+1]))
+		print("DISHLIST", dishList)
+		print("GROCERY LIST", groceryList)
+
+
+		newListBread = []
+		newListDairies = []
+		newListSpices = []
+		newListFrozen = []
+		newListVegos = []
+		newListCheese = []
+		newListPasta = []
+		newListCheckout = []
+		newOtherList = []
+		print("GROCERY LIST LENGTH: ", len(groceryList))
+
+		## sort grocerylist into sub-category grocerylists
+
+		for x in groceryList:
+			if any(word in x.lower() for word in BREAD_CATEGORY):
+				newListBread.append(x)
+			elif any(word in x.lower() for word in DAIRY_CATEGORY):
+				newListDairies.append(x)
+			elif any(word in x.lower() for word in SPICES_CATEGORY):
+				newListSpices.append(x)
+			elif any(word in x.lower() for word in FROZEN_CATEGORY):
+				newListFrozen.append(x)
+			elif any(word in x.lower() for word in VEGETABLES_CATEGORY):
+				newListVegos.append(x)
+			elif any(word in x.lower() for word in CHEESE_CATEGORY):
+				newListCheese.append(x)
+			elif any(word in x.lower() for word in PASTA_CATEGORY):
+				newListPasta.append(x)
+			elif any(word in x.lower() for word in CHECKOUT_CATEGORY):
+				newListCheckout.append(x)
+			else:
+				newOtherList.append(x)
+		tmpList = []
+
+		for x in newListBread:
+			tmpList.append(x)
+		for x in newListDairies:
+			tmpList.append(x)
+		for x in newListSpices:
+			tmpList.append(x)
+		for x in newListFrozen:
+			tmpList.append(x)
+		for x in newListVegos:
+			tmpList.append(x)
+		for x in newListCheese:
+			tmpList.append(x)
+		for x in newListPasta:
+			tmpList.append(x)
+		for x in newListCheckout:
+			tmpList.append(x)
+		for x in newOtherList:
+			tmpList.append(x)
+
+		duplicates = [item for item, count in collections.Counter(tmpList).items() if count > 1]
+
+		duplicatesIndexList = []
+
+		for i in range(len(duplicates)):
+			duplicatesIndexList.append(indices(tmpList, duplicates[i]))
+
+		numberOfDuplicatesList = []
+		indexToRemoveList = []
+		firstIndexList = []
+
+		for i in range(len(duplicatesIndexList)):
+			numberOfDuplicatesList.append(len(duplicatesIndexList[i]))
+			indexToRemoveList.append(duplicatesIndexList[i][1:])
+			firstIndexList.append(duplicatesIndexList[i][0])
+
+		for i in range(len(firstIndexList)):
+			tmpList[firstIndexList[i]] = str(numberOfDuplicatesList[i]) + " x " + str(tmpList[firstIndexList[i]])
+		
+		for i in range(len(duplicates)):
+			tmpList.remove(duplicates[i])
+		
+		finalList = []
+		for x in tmpList:
+			finalList.append(x)
+			finalList.append("False")
+
+
+		now = datetime.now() # current date and time	
+		date_time = now.strftime("%d/%m/%Y")	
+		my_date = date.today()
+		dishDays = []
+
+		for i in range(len(recepies)):
+			td = timedelta(days=i+1)
+			dishDayTmp = now + td
+			dishDay = dishDayTmp.strftime("%d/%m/%Y")	
+			dishDays.append(str(dishDay))
+
+		dishDayList = list(zip(dishDays, dishListTmp))
+		#init the calendar
+		cal = Calendar()
+		# Some properties are required to be compliant
+		cal.add('prodid', '-//My calendar product//example.com//')
+		cal.add('version', '2.0')
+
+		for i in range(len(dishDayList)):
+			# Add subcomponents
+			event = Event()
+			t = 0
+			n = 1 # N. . .
+			dishes = [x[n] for x in dishDayList]
+			days = [x[t] for x in dishDayList]
+			dateTmp = [int(d) for d in str(days[i]).split('/') if d.isdigit()]
+			event.add('summary', dishes[i])
+			event.add('dtstart', datetime(dateTmp[2], dateTmp[1], dateTmp[0], 16, 0, 0, tzinfo=pytz.utc))
+			event.add('dtend', datetime(dateTmp[2], dateTmp[1], dateTmp[0], 17, 0, 0, tzinfo=pytz.utc))
+			cal.add_component(event)
+		#Write to disk
+		directory = Path.cwd() / 'DishListCal'
+		try:
+			directory.mkdir(parents=True, exist_ok=True)
+		except FileExistsError:
+			print("Folder already exists")
+		else:
+			print("Folder was created")
+	
+		f = open(os.path.join(directory, 'dishlist.ics'), 'wb')
+		f.write(cal.to_ical())
+		f.close()
+
+
+		lst_tuple_grocery = [x for x in zip(*[iter(finalList)]*2)]
+		dish_list_tuple = [x for x in zip(*[iter(dishList)]*2)]
+
+		f = open("grocerylist.txt", "w")
+		for i in range (len(finalList[::2])):
+			f.write(finalList[::2][i] + "\n")
+		f.close()
+		t = open("dishlist.txt", "w")
+		for i in range (len(dishList)):
+			t.write(dishList[i] + "\n")
+		t.close()
+	
+		return data
 
 @app.route('/Siri/PromenadSummary', methods=['GET'])
 def PromenadSummary():
