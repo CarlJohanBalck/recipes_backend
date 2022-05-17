@@ -66,11 +66,7 @@ def indices(lst, item):
 @app.route('/Siri/Recepies', methods=['GET'])
 def getRecepies():
 	recepies = RECEPIES
-	# for i in range(len(recepies)):
-	# 	recepies[i][0] = str(re.sub(r"\([^()]*\)","", recepies[i][0]))
-	# 	recepies[i][0] = recepies[i][0][:-2]
-			
-		
+
 	return json.dumps(list(recepies))
 
 @app.route('/Siri/Matlista', methods=['GET'])
@@ -282,7 +278,7 @@ def Matlista():
 	# 	dish_list_tuple
 	# )
 
-	# # Sync up changes
+	# Sync up changes
 	# keep.sync()
 	dishesSummary = ""
 	for i in range (len(dishList[::2])):
@@ -500,8 +496,8 @@ def ReactRecepies():
 		for i in range (len(dishList)):
 			t.write(dishList[i] + "\n")
 		t.close()
-	
-		return data
+
+		return json.dumps(list(finalList[::2]))
 
 @app.route('/Siri/PromenadSummary', methods=['GET'])
 def PromenadSummary():
