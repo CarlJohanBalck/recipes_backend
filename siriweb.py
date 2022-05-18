@@ -23,6 +23,7 @@ from config import (
 	IP_ADDRESS,
 	PORT,
 	RECEPIES,
+	PRICES,
 	KEEP_EMAIL,
 	KEEP_PASSWORD,
 	BREAD_CATEGORY,
@@ -251,7 +252,7 @@ def Matlista():
 		veckodag = "Lördag"
 
 	match = veckodag + " " + date_time
-
+	
 	lst_tuple_grocery = [x for x in zip(*[iter(finalList)]*2)]
 	dish_list_tuple = [x for x in zip(*[iter(dishList)]*2)]
 
@@ -278,7 +279,7 @@ def Matlista():
 	# 	dish_list_tuple
 	# )
 
-	# Sync up changes
+	# #Sync up changes
 	# keep.sync()
 	dishesSummary = ""
 	for i in range (len(dishList[::2])):
@@ -484,10 +485,12 @@ def ReactRecepies():
 		f.write(cal.to_ical())
 		f.close()
 
+		priceList = 0
 
-		lst_tuple_grocery = [x for x in zip(*[iter(finalList)]*2)]
-		dish_list_tuple = [x for x in zip(*[iter(dishList)]*2)]
-
+		for i in range (len(finalList[::2])):
+			for j in range (len(PRICES)): 
+				if finalList[::2][i] == PRICES[j][0]:
+					priceList = priceList + PRICES[j][1]
 		f = open("grocerylist.txt", "w")
 		for i in range (len(finalList[::2])):
 			f.write(finalList[::2][i] + "\n")
@@ -496,7 +499,7 @@ def ReactRecepies():
 		for i in range (len(dishList)):
 			t.write(dishList[i] + "\n")
 		t.close()
-
+		finalList.append(str(priceList))
 		return json.dumps(list(finalList[::2]))
 
 @app.route('/Siri/PromenadSummary', methods=['GET'])

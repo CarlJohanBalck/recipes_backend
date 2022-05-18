@@ -1,43 +1,57 @@
-IP_ADDRESS = "192.168.1.72"
+from datetime import datetime, date, timedelta
+
+
+PRICES=[["4 bitar lax", 89], ["1 spetskål", 36], ["1 purjolök", 23], ["1/2 purjolök", 23], ["1/2 röd chili", 12], ["2 msk japansk soya", 25]]
+IP_ADDRESS = "192.168.10.7"
 PORT = 5001
 KEEP_EMAIL = "test@test.com"
-KEEP_PASSWORD = "test"
-BREAD_CATEGORY = ["bröd"]
-DAIRY_CATEGORY = ["mjölk", "matlagningsgrädde", "yoghurt", "vispgrädde", "fraische", "matlagningsyoghurt", "ägg", "gräddfil", "parmesanost", "smör", "grädde"]
-SPICES_CATEGORY = ["garam masala", "kryddmix", "tacochips", "vitpepparkorn", "kryddpepparkorn"]
+KEEP_PASSWORD = "123456789"
+BREAD_CATEGORY = ["bröd", "majsstärkelse", "panko"]
+DAIRY_CATEGORY = ["mjölk", "matlagningsgrädde", "yoghurt", "vispgrädde", "fraische", "matlagningsyoghurt", "ägg", "gräddfil", "parmesanost", "smör", "grädde", "smetana"]
+SPICES_CATEGORY = ["garam masala", "kryddmix", "tacochips", "vitpepparkorn", "kryddpepparkorn", "kardemumma", "kanel", "spiskummin", "paprikapulver", "oregano"]
 FROZEN_CATEGORY = ["lax", "vegofärs", "persilja", "formbar färs"]
 VEGETABLES_CATEGORY = ["lök", "potatis", "vitlök", "sötpotatis", "vitlöksklyftor", "aubergine", "tomater", "ingefära", "spenat", "spetskål", "gurka", "citron", "chili", "bladspenat", "basilika", "kålrot", "morötter", "tofu",
-	"avokados", "avokado", "broccoli", "vegobacon", "rödbetor", "muskotnöt", "svamp", "färsk oregano"]
-CHEESE_CATEGORY = ["ost", "halloumi", "isterband", "tortellini"]
+	"avokados", "avokado", "broccoli", "vegobacon", "rödbetor", "muskotnöt", "svamp", "färsk oregano", "zucchini", "champinjoner", "machesallad", "blomkål", "paprika", "lime"]
+CHEESE_CATEGORY = ["ost", "halloumi", "isterband", "tortellini", "ricotta", "parmensan", "surdegspizzadeg"]
 PASTA_CATEGORY = ["tomatpuré", "ketchup", "spagetti", "pasta", "krossade tomater", "buljongtärningar", "buljongtärning", "soya", "honung", "solrosfrön", "grönsaksfond", 
-	"grönsaksbuljong", "vetemjöl", "ris", "lasagneplattor"]
-CHECKOUT_CATEGORY = ["pinjenötter"]
-
+	"grönsaksbuljong", "vetemjöl", "ris", "lasagneplattor", "svarta bönor", "majskorn", "vetetortilla", "lingonsyft", "pesto", "matlagningsvin", "majonäs", "bbq", "sesamfrön", "raspolja", "srirachasås"]
+CHECKOUT_CATEGORY = ["pinjenötter", "cashewnötter", "valnötter"]
 RECEPIES = [
-	["Soyalax [https://www.ica.se/recept/sojalax-med-bakad-spetskal-721655/]", "1 spetskål", "1/2 purjolök", "4 bitar lax", "2 msk japansk soya", "1/2 röd chili"], 
-	["Potatis och purjolöksoppa [https://www.ica.se/recept/kramig-potatis-och-purjolokssoppa-716077/?referrer=https%3A%2F%2Fwww.google.se#pfset=1]", "600g mjölig potatis", "1 purjolök", "10dl grönsaksbuljong", "3dl vispgrädde"],
-	["Ostpaj med broccoli [https://www.ica.se/recept/ostpaj-med-broccoli-727699/?referrer=https%3A%2F%2Fwww.ica.se%2Frecept%2Fvegetarisk%2F%3Freferrer%3Dhttps%3A%2F%2Fwww.ica.se%2F%3Freferrer%3D#pfset=1]", "1 rödlök", "250g broccoli", "1 frp vegobacon", "6 ägg", "3dl mjölk", "1 1/2 dl riven prästost"],
-	["Raggmunk med fläsk [https://www.ica.se/recept/raggmunk-med-flask-721803/?referrer=https%3A%2F%2Fwww.google.se#pfset=1]", "2dl vetemjöl", "4dl mjölk", "2 ägg", "900g fast potatis", "2 frp rökt tofu"],
-	["Pasta med tomatsås och rostad aubergine [https://www.ica.se/recept/pasta-med-tomatsas-och-rostad-aubergine-727238/?referrer=https%3A%2F%2Fwww.google.se#pfset=1]", "250g aubergine", "1/2 gul lök", "1 vitlök", "1 msk tomatpuré", "1 frp krossade tomater", "torkad basilika", "chilipulver"],
-	["Varma mackor med svampstuvning [https://www.ica.se/recept/varma-mackor-med-svampstuvning-722384/?referrer=https%3A%2F%2Fwww.google.se#pfset=1]", "1l svamp", "1 gul lök", "1msk vetemjöl", "3dl vispgrädde", "4 skivor bröd", "8 skivor ost"],
-	["Krispig lax m krämig parmesansås [https://www.mathem.se/recept/krispig-lax-i-kramig-parmesansas?utm_source=ig&utm_medium=paid-social&utm_campaign=pd-fbig-conversions-b2c-prospecting&utm_content=carousel-prospecting-b2c-k%C3%B6p_hem_fem.20211102&utm_term=default-midf-a2565-all_regions-broad-video%2Bstory&fbclid=PAAabvyyUczN3Yw3t4IauwGa4_NcGCbpneCeVzmvQpyEy7VCKO0zC7EH1VggA&external_browser_redirect=true]", "500g laxfilé fryst", "3dl vispgrädde", "100g parmesanost", "färsk gräslök", "700g fast potatis"],
-	["Palak paneer med tomat och halloumi [https://www.ica.se/recept/palak-paneer-med-tomat-och-halloumi-722056/?referrer=https%3A%2F%2Fwww.google.se#pfset=1]", "1 schalottenlök", "2 vitlöksklyftor", "2 tomater", "2msk riven ingefära", "2msk tomatpuré", "1msk garam masala", "390g krossade tomater", "2dl vispgrädde", "grönsaksbuljong", "200g färsk spenat", "400g halloumi"],
-	["Tacopaj [https://www.arla.se/recept/tacopaj/]", "500g vegofärs", "Taco kryddmix x2", "Creme fraische paprika och chili", "Creme fraische naturell", "250g körsbärstomater", "Arla köket riven ost texmex", "3dl gräddfil", "tacochips"],
-	["Fetaost biffar med klyftpotatis och tzatsiki [https://www.zeta.nu/recept/fetaostbiffar/]", "500g formbar färs", "1 ägg", "1 citron", "1frp fetaost", "500g potatis", "Grekisk yoghurt", "Liten gurka", "1 vitlöksklyftor", "färsk oregano"],
-	["Rotmos och isterband [https://www.ica.se/recept/rotmos-1261/?referrer=https%3A%2F%2Fwww.google.se%2F#pfset=1]", "Isterband", "1 kålrot", "2 morötter", "6 medelstora mjöliga potatisar", "grönsaksfond", "5 vitpepparkorn", "5 kryddpepparkorn"],
-	["Paneer butter masla [Elins receptbok]", "400g salladsost", "1 gul lök", "2 vitlöksklyftor", "1msk ingefära", "Garam masala", "Chilipulver", "4msk tomatpuré", "Ketchup", "3dl mjölk", "2dl grädde"],
-	["Pastagratäng m rökt lax och spenat [Elins receptbok]", "500g tortellini", "1dl vetemjöl", "1 krm riven muskotnöt", "200g rökt lax", "200g fryst bladspenat", "250g körsbärstomater"],
-	["Rödbetspaj [Elins receptbok]", "4 färska rödbetor", "2dl gräddfil", "1 ägg", "1/2msk flytande honung", "4dl lagrad ost", "1/2dl solrosfrön"],
-	["Lasagne [Elins receptbok]", "2 gula lök", "2 vitlöksklyftor", "500g vegofärs", "4msk tomatpuré", "500g krossade tomater", "1 buljongtärning", "Lasagneplattor", "2dl ost", "Smör", "1dl vetemjöl", "3dl mjölk"],
-	["Krämig citronpasta m halloumikrutonger [Elins receptbok]", "1 citron", "2-3dl creme fraische", "Bladspenat", "Citronpeppar", "Buljongtärningar", "200g halloumi", "Basilika"],
-	["Basilikasås [Elins receptbok]", "Pasta", "1dl persilja", "1dl pressad basilika", "1 vitlöksklyftor", "2dl matlagningsyoghurt"],
-	["Pasta med krämig avokadosås [Elins receptbok]", "Pasta", "2 avokados", "1 gul lök", "2dl creme fraische", "Citronsaft", "200g halloumi", "Pinjenötter"],
-	["Pytt i panna m. halloumi [Elins receptbok]", "500g potatis", "500g sötpotatis", "2 rödlökar", "1 vitlöksklyftor"],
-	["Köttfärsås och spagetti", "4msk tomatpuré", "1 gul lök", "500g vegofärs", "Ketchup", "Soya", "Spagetti", "3dl matlagningsgrädde", "2msk vetemjöl"],
-	["Halloumi Stroganoff", "400g halloumi", "Ris", "1 gul lök", "3dl matlagningsgrädde", "Ketchup", "4msk tomatpuré", "2msk vetemjöl"],
-	["Risotto [https://www.ica.se/recept/risotto-med-skogschampinjoner-716952/]", "3 schalottenlök", "1 vitlöksklyftor", "9 dl svampbuljong", "3dl risottoris", "2dl vitt matlagningsvin", "250g kastanjechampinjoner", "2 dl riven parmesan", "ruccola", "3msk smör"],
-	["Pasta Carbonara med halloumi [https://www.koket.se/pasta-carbonara-med-halloumi]", "Spagetti", "200g halloumi", "3dl vispgrädde", "1dl parmensanost", "3 ägg", "1 vitlöksklyftor"],
-	["Spenatsoppa + minibaguetter [https://www.arla.se/recept/spenatsoppa/]", "Hackad spenat", "1 gul lök", "1 vitlöksklyftor", "6dl gräddmjölk", "Grönsaksbuljong", "1 muskotnöt", "4 kokta ägg"],
-	["Champinjonsoppa [https://www.ica.se/recept/?recipeid=715952]", "500g champinjoner", "1 gul lök", "1/2dl grönsaksfond", "5 dl vispgrädde", "5 dl mjölk", "1 1/2msk majsstärkelse"],
-	["Spenatpannkaka [https://www.ica.se/recept/spenatpannkaka-med-pesto-och-avokado-728005/?referrer=https%3A%2F%2Fwww.ica.se%2Frecept%2Fvegetarisk%2F%3Freferrer%3Dhttps%3A%2F%2Fwww.ica.se%2F%3Freferrer%3D#pfset=1]", "65 g färsk spenat", "2 ägg", "2dl vetemjöl", "2 1/2dl mjölk", "2 avokado", "2dl matyoghurt", "4msk pesto", "65g machesallad"],
-	["Vego enchiladas [https://www.ica.se/recept/vego-enchiladas-723379/]", "2 förp kokta svarta bönor (à 380 g)", "1 förp majskorn (à 340 g)", "390g pastasås (tomat & chili)", "390g pastasås (tomat & basilika)", "150g riven ost", "8 vetetortilla (medium)", "2 dl gräddfil"]]
+	["Soyalax (https://www.ica.se/recept/sojalax-med-bakad-spetskal-721655/) v", "1 spetskål", "1/2 purjolök", "4 bitar lax", "2 msk japansk soya", "1/2 röd chili"], 
+	["Potatis och purjolöksoppa (https://www.ica.se/recept/kramig-potatis-och-purjolokssoppa-716077/?referrer=https%3A%2F%2Fwww.google.se#pfset=1) v", "600g mjölig potatis", "1 purjolök", "10dl grönsaksbuljong", "3dl vispgrädde"],
+	["Raggmunk med fläsk (https://www.ica.se/recept/raggmunk-med-flask-721803/?referrer=https%3A%2F%2Fwww.google.se#pfset=1) v", "2dl vetemjöl", "4dl mjölk", "2 ägg", "900g fast potatis", "2 frp rökt tofu"],
+	["Pasta med tomatsås och rostad aubergine (https://www.ica.se/recept/pasta-med-tomatsas-och-rostad-aubergine-727238/?referrer=https%3A%2F%2Fwww.google.se#pfset=1) h", "250g aubergine", "1/2 gul lök", "1 vitlök", "1 msk tomatpuré", "1 frp krossade tomater", "torkad basilika", "chilipulver"],
+	["Varma mackor med svampstuvning (https://www.ica.se/recept/varma-mackor-med-svampstuvning-722384/?referrer=https%3A%2F%2Fwww.google.se#pfset=1) v", "1l svamp", "1 gul lök", "1msk vetemjöl", "3dl vispgrädde", "4 skivor bröd", "8 skivor ost"],
+	["Palak paneer med tomat och halloumi (https://www.ica.se/recept/palak-paneer-med-tomat-och-halloumi-722056/?referrer=https%3A%2F%2Fwww.google.se#pfset=1) h", "1 schalottenlök", "2 vitlöksklyftor", "2 tomater", "2msk riven ingefära", "2msk tomatpuré", "1msk garam masala", "390g krossade tomater", "2dl vispgrädde", "grönsaksbuljong", "200g färsk spenat", "400g halloumi"],
+	["Rotmos och isterband (https://www.ica.se/recept/rotmos-1261/?referrer=https%3A%2F%2Fwww.google.se%2F#pfset=1) v", "Isterband", "1 kålrot", "2 morötter", "6 medelstora mjöliga potatisar", "grönsaksfond", "5 vitpepparkorn", "5 kryddpepparkorn"],
+	["Paneer butter masla (Elins receptbok) v", "400g salladsost", "1 gul lök", "2 vitlöksklyftor", "1msk ingefära", "Garam masala", "Chilipulver", "4msk tomatpuré", "Ketchup", "3dl mjölk", "2dl grädde"],
+	["Pastagratäng m rökt lax och spenat (Elins receptbok) v", "500g tortellini", "1dl vetemjöl", "1 krm riven muskotnöt", "200g rökt lax", "200g fryst bladspenat", "250g körsbärstomater"],
+	["Rödbetspaj (Elins receptbok) v", "4 färska rödbetor", "2dl gräddfil", "1 ägg", "1/2msk flytande honung", "4dl lagrad ost", "1/2dl solrosfrön"],
+	["Lasagne (Elins receptbok) v", "2 gula lök", "2 vitlöksklyftor", "500g vegofärs", "4msk tomatpuré", "500g krossade tomater", "1 buljongtärning", "Lasagneplattor", "2dl ost", "Smör", "1dl vetemjöl", "3dl mjölk"],
+	["Krämig citronpasta m halloumikrutonger (Elins receptbok) h", "1 citron", "2-3dl creme fraische", "Bladspenat", "Citronpeppar", "Buljongtärningar", "200g halloumi", "Basilika"],
+	["Basilikasås (Elins receptbok) v", "Pasta", "1dl persilja", "1dl pressad basilika", "1 vitlöksklyftor", "2dl matlagningsyoghurt"],
+	["Pasta med krämig avokadosås (Elins receptbok) h", "Pasta", "2 avokados", "1 gul lök", "2dl creme fraische", "Citronsaft", "200g halloumi", "Pinjenötter"],
+	["Köttfärsås och spagetti v", "4msk tomatpuré", "1 gul lök", "500g vegofärs", "Ketchup", "Soya", "Spagetti", "3dl matlagningsgrädde", "2msk vetemjöl"],
+	["Halloumi Stroganoff v", "400g halloumi", "Ris", "1 gul lök", "3dl matlagningsgrädde", "Ketchup", "4msk tomatpuré", "2msk vetemjöl"],
+	["Risotto (https://www.ica.se/recept/risotto-med-skogschampinjoner-716952/) h", "3 schalottenlök", "1 vitlöksklyftor", "9 dl svampbuljong", "3dl risottoris", "2dl vitt matlagningsvin", "250g kastanjechampinjoner", "2 dl riven parmesan", "ruccola", "3msk smör"],
+	["Pasta Carbonara med halloumi (https://www.koket.se/pasta-carbonara-med-halloumi) v", "Spagetti", "200g halloumi", "3dl vispgrädde", "1dl parmensanost", "3 ägg", "1 vitlöksklyftor"],
+	["Spenatsoppa + minibaguetter (https://www.arla.se/recept/spenatsoppa/) v", "Hackad spenat", "1 gul lök", "1 vitlöksklyftor", "6dl gräddmjölk", "Grönsaksbuljong", "1 muskotnöt", "4 kokta ägg"],
+	["Champinjonsoppa (https://www.ica.se/recept/?recipeid=715952) h", "500g champinjoner", "1 gul lök", "1/2dl grönsaksfond", "5 dl vispgrädde", "5 dl mjölk", "1 1/2msk majsstärkelse"],
+	["Spenatpannkaka (https://www.ica.se/recept/spenatpannkaka-med-pesto-och-avokado-728005/?referrer=https%3A%2F%2Fwww.ica.se%2Frecept%2Fvegetarisk%2F%3Freferrer%3Dhttps%3A%2F%2Fwww.ica.se%2F%3Freferrer%3D#pfset=1) v", "65 g färsk spenat", "2 ägg", "2dl vetemjöl", "2 1/2dl mjölk", "2 avokado", "2dl matyoghurt", "4msk pesto", "65g machesallad"],
+	["Vego enchiladas (https://www.ica.se/recept/vego-enchiladas-723379/) v", "2 förp kokta svarta bönor (à 380 g)", "1 förp majskorn (à 340 g)", "390g pastasås (tomat & chili)", "390g pastasås (tomat & basilika)", "150g riven ost", "8 vetetortilla (medium)", "2 dl gräddfil"],
+	["Zucchinirullar med ricotta i tomatsås (https://www.koket.se/zucchinirullar-med-ricotta-i-tomatsas) h", "2 zucchini", "3 dl ricotta", "1dl parmesanost", "65g babyspenat", "2dl valnötter", "4 vitlöksklyftor", "2 frp krossade tomater á 400g", "1 gul lök", "1-2 röda chilifrukter", "2msk torkad oregano"],
+	["Ugnspannkaka m rökt tofu och lingon (https://www.ica.se/recept/ugnspannkaka-grundrecept-720978/) v", "3dl vetemjöl", "6dl mjölk", "3 ägg", "2frp rökt tofu", "Lingonsyft"],
+	["Indisk butter halloumi (https://www.koket.se/indisk-butter-halloumi) v", "400 g halloumi", "2 gul lök", "3 vitlöksklyftor", "1msk ingefära", "400g finkrossade tomater", "3dl vispgrädde", "50g smör", "2msk tomatpuré", "1tsk malen kardemumma", "0,5 tsk malen kanel", "1msk malen spiskummin", "1msk paprikapulver", "Ris"],
+	["Benjamins auberginegratäng (https://www.koket.se/benjamins-auberginegratang) h", "2 aubergine", "5 vitlöksklyftor", "3 bukar hela konserverade tomater san marzano a 400g", "0.5 kruka basilika", "2 ägg", "2dl vetemjöl", "200g parmesanost", "1 mozzarellaost"],
+	["Cacio pizza (https://www.ica.se/recept/cacio-e-pepe-pizza-728405/) h", "1 Surdegspizzadeg", "250g ricottaost", "1 citron", "3dl riven parmensan", "3dl riven percorinost"],
+	["Tomatsoppa + vitlöksbaguette v", "1 röd lök", "2.5dl matlagningsgrädde", "2 frp 500g krossade tomater", "Grönsaksbuljong", "1 vitlöksbaguette"],
+	["Raggmunk m rökt tofu och sylt + smetana (https://www.ica.se/recept/raggmunk-med-flask-721803/?referrer=https%3A%2F%2Fwww.google.se#pfset=1) v", "2dl vetemjöl","4dl mjölk", "2 ägg", "900g fast potatis", "2msk smör", "2frp rökt tofu", "1frp smetana", "Lingonsyft"],
+	["Teriyaki (https://www.javligtgott.se/vegansk-teriyaki-pa-barta-chilli-lime/) v", "2frp rökt tofu", "Salladslök", "2msk ingefära", "3 vitlöksklyftor", "2msk sirap", "1tsk sesamolja", "1.5msk risvinsvinäger", "chilipulver", "1msk majsstärkelse"],
+	["Fredagspasta (https://baraenkakatill.se/fredagspasta/) h", "1 vitlöksklyftor", "Mandlar", "8 babyplommontomater", "1 kruka färsk basilika", "1dl parmesanost", "2frp burrata", "spagetti"],
+	["Tacos med friterad halloumi och grön salsa (https://www.ica.se/recept/tacos-med-friterad-halloumi-och-gron-salsa-727747/?referrer=https%3A%2F%2Fwww.ica.se%2Frecept%2Fvegetarisk%2Fmiddag%2F%3Freferrer%3Dhttps%3A%2F%2Fwww.ica.se%2F%3Freferrer%3D#pfset=1) h", "1 gurka", "2 avokado", "1 jalapeno", "salladslök", "1 lime", "400g halloumi", "Vetemjöl", "3 ägg", "4dl panko", "1l raspolja", "1frp gräddfil", "Srirachasås", "Tacobröd"],
+	["Chiligryta med tomat och kidneybönor (https://www.zeta.nu/recept/chiligryta-med-tomat-och-kidneybonor/) v", "3 vitlöksklyftor", "1 gul lök", "1 chilipeppar", "olivolja", "1 frp krossade tomater", "1 matlagningsvin", "2frp kidneybönor", "Salladslök"],
+	["Pasta pesto med mozzarella och pumpakärnor (https://www.ica.se/recept/pasta-pesto-med-mozzarella-och-pumpakarnor-727560/) v", "250g broccoli", "1 vitlöksklyftor", "4 port pasta", "2 1/2dl matlagningsgrädde", "1/2dl pesto basilika", "2fpr mozzarella", "1dl pumpakärnor"],
+	["Bahn mi h", "2 surdegsbaguetter", "1 gurka", "1 rättika", "Ättikssprit", "2 morötter", "2 frp rökt tofu", "1 srirachamajjo", "salladsmix"],
+	["Buffaloblomkål (Hello Fresh) v", "1 kg potatis", "2 blomkål", "200g majonäs", "1dl panko", "baby rays bbq sås", "2dl gräddfil"],
+	["Honungsglaserad halloumi v", "400g spetskål", "2 morötter", "2 paprika", "Salladslök", "1 chili", "1 lime", "cashewnötter", "2msk ingefära", "2 vitlöksklyftor", "Soyasås", "50g honung", "Ketchup", "Sesamfrön", "400g halloumi"],
+	["Ricottatoast (Hello Fresh) v", "2frp kikärtor", "2 surdegsbaguetter", "2 vitlöksklyftor", "1frp babyplommontomater", "1 rödlök", "1 citron", "2 avokado", "200g ricotta"]]
