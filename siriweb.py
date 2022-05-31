@@ -346,7 +346,7 @@ def LiloPromenad():
 @app.route('/Siri/ReactRecepies', methods=['POST'])
 def ReactRecepies():
 		data = request.json
-		recepies = data.get("list")
+		recepies = data.get("currentList")
 		dishList = []
 		dishListTmp = []
 		groceryList = []
