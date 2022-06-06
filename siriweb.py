@@ -23,7 +23,6 @@ from config import (
 	IP_ADDRESS,
 	PORT,
 	RECEPIES,
-	PRICES,
 	KEEP_EMAIL,
 	KEEP_PASSWORD,
 	BREAD_CATEGORY,
@@ -487,10 +486,7 @@ def ReactRecepies():
 
 		priceList = 0
 
-		for i in range (len(finalList[::2])):
-			for j in range (len(PRICES)): 
-				if finalList[::2][i] == PRICES[j][0]:
-					priceList = priceList + PRICES[j][1]
+		
 		f = open("grocerylist.txt", "w")
 		for i in range (len(finalList[::2])):
 			f.write(finalList[::2][i] + "\n")
