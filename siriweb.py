@@ -18,6 +18,8 @@ from pathlib import Path
 import os
 import pytz
 import json
+from threading import Thread
+
 
 from config import (
 	IP_ADDRESS,
@@ -36,6 +38,8 @@ from config import (
 )
 hostname = socket.gethostname()
 isOnWalk = False
+
+hasBeenGiven = False
 
 ip_address = IP_ADDRESS
 app = Flask(__name__)
@@ -527,7 +531,7 @@ def getEverySecondDateInFuture(date):
 
 
 @app.route('/Siri/LiloStatus', methods=['GET'])
-def LiloStatus():
+def LiloStatusSpeech():
 	config = configparser.ConfigParser()
 	config.read('lastDate.ini')
 	now = datetime.now() # current date and time	
@@ -560,19 +564,110 @@ def LiloStatus():
 		return "Idag ska Lilo få medicin, men jag har redan skrivit upp att hon fått medicin idag " + config['DEFAULT']['LAST_DATE']
 		
 	if date_time in futureMedicationDates: 
-		r = 0
-		g = 255
-		b = 0
-		sense.clear((r, g, b))
-
 		return ('Ja, idag ska Lilo få kortison. Lilo fick kortison senast ') + config['DEFAULT']['LAST_DATE'] + ('...När du gett henne medicin, säg Lilo fick medicin så skriver jag upp det')
 	else: 
-		r = 255
-		g = 0
-		b = 0
-
-		sense.clear((r, g, b))
+	
 		return ('Nej, idag ska Lilo inte få kortison. Lilo fick kortison senast ') + config['DEFAULT']['LAST_DATE']
+	
+def LiloStatusLight():
+	config = configparser.ConfigParser()
+	config.read('lastDate.ini')
+	now = datetime.now() # current date and time	
+	date_time = now.strftime("%d/%m/%Y")
+	my_date = date.today()
+	sense = SenseHat()
+	weekday = calendar.day_name[my_date.weekday()]
+	last_date = config['DEFAULT']['LAST_DATE']
+	last_date_parsed = last_date.split(" ")[1]
+	futureMedicationDates = getEverySecondDateInFuture(last_date_parsed)
+
+	if(weekday == "Sunday"):
+		veckodag = "Söndag"
+	if(weekday == "Monday"):
+		veckodag = "Måndag"
+	if(weekday == "Tuesday"):
+		veckodag = "Tisdag"
+	if(weekday == "Wednesday"):
+		veckodag = "Onsdag"
+	if(weekday == "Thursday"):
+		veckodag = "Torsdag"
+	if(weekday == "Friday"):
+		veckodag = "Fredag"
+	if(weekday == "Saturday"):
+		veckodag = "Lördag"
+
+	match = veckodag + " " + date_time
+	
+		
+	if date_time in futureMedicationDates: 
+		while True:
+			try:
+				r = 0
+				g = 255
+				b = 0
+				sense.clear((r, g, b))
+				time.sleep(2)
+				lastDate = config['DEFAULT']['LAST_DATE'].split(' ', 1)[1]
+				now = datetime.now() # current date and time	
+				date_time = now.strftime("%d/%m/%Y")	
+				date_format = "%d/%m/%Y"
+				a = datetime.strptime(date_time, date_format)
+				b = datetime.strptime(lastDate, date_format)
+				delta = a - b
+
+				for i in range (delta.days):
+					sense.clear((0, 0, 0))
+					time.sleep(0.2)
+					sense.clear((0, 255, 0))
+					time.sleep(0.2)
+					sense.clear((0, 0, 0))
+								
+				
+			except AttributeError:
+				time.sleep(2)
+				continue
+
+	else: 
+		while True:
+			try:
+				r = 255
+				g = 0
+				b = 0
+				sense.clear((r, g, b))
+				time.sleep(2)
+				lastDate = config['DEFAULT']['LAST_DATE'].split(' ', 1)[1]
+				now = datetime.now() # current date and time	
+				date_time = now.strftime("%d/%m/%Y")	
+				date_format = "%d/%m/%Y"
+				a = datetime.strptime(date_time, date_format)
+				b = datetime.strptime(lastDate, date_format)
+				delta = a - b
+
+				for i in range (delta.days):
+					sense.clear((0, 0, 0))
+					time.sleep(0.2)
+					sense.clear((255, 0, 0))
+					time.sleep(0.2)
+					sense.clear((0, 0, 0))
+								
+				
+			except AttributeError:
+				time.sleep(2)
+				continue
+		# r = 255
+		# g = 0
+		# b = 0
+
+		# sense.clear((r, g, b))
+		# time.sleep(0.5)
+		# sense.clear((0, 255, 0))
+		# time.sleep(0.5)
+		# sense.clear((0, 0, 0))
+		# time.sleep(0.5)
+		# sense.clear((0, 0, 0))
+		# time.sleep(0.5)
+		
+		# return ('Nej, idag ska Lilo inte få kortison. Lilo fick kortison senast ') + config['DEFAULT']['LAST_DATE']
 	
 
 @app.route('/Siri/LiloFick', methods=['POST'])
@@ -605,6 +700,7 @@ def LiloFick():
 	if (match == config['DEFAULT']['LAST_DATE']):
 		return "Jag har redan skrivit upp att Lilo fick medicin idag " + config['DEFAULT']['LAST_DATE']
 	else: 
+		hasBeenGiven = True
 		config['DEFAULT']['LAST_DATE'] = veckodag + " " + date_time
 		with open('lastDate.ini', 'w') as configfile:
 			config.write(configfile)
@@ -612,5 +708,7 @@ def LiloFick():
 		return "Då noterar jag att Lilo fick medicin " + veckodag + " den " + date_time
 
 if __name__ == '__main__':
-	LiloStatus()
-	app.run(debug=True, host=ip_address, port=PORT)
+	thread = Thread(target = LiloStatusLight)
+	thread.start()
+	app.run(debug=True, host=ip_address, port=PORT, use_reloader=False)
+	
