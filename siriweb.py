@@ -18,6 +18,7 @@ from pathlib import Path
 import os
 import pytz
 import json
+import mysql.connector as mariadb;
 from threading import Thread
 
 
@@ -34,7 +35,12 @@ from config import (
 	VEGETABLES_CATEGORY,
 	CHEESE_CATEGORY,
 	PASTA_CATEGORY,
-	CHECKOUT_CATEGORY
+	CHECKOUT_CATEGORY,
+	DB_USER,
+	DB_PASSWORD,
+	DB_HOST,
+	DB_PORT,
+	DB_DATABASE
 )
 hostname = socket.gethostname()
 isOnWalk = False
@@ -69,13 +75,35 @@ def indices(lst, item):
 
 @app.route('/Siri/Recepies', methods=['GET'])
 def getRecepies():
-	recepies = RECEPIES
+	# recepies = RECEPIES
+	try:
+		conn = mariadb.connect(
+			user=DB_USER,
+			password=DB_PASSWORD,
+			host=DB_HOST,
+			port=DB_PORT,
+			database=DB_DATABASE
+		)
+	except mariadb.Error as e:
+		print(f"Error connecting to MariaDB Platform: {e}")
+		sys.exit(1)
 
-	return json.dumps(list(recepies))
+	# Get Cursor
+	cur = conn.cursor()
+	cur.execute("SELECT name, id from Recepies")
+	database_recepie_names = []
+	for name in cur:
+		database_recepie_names.append(name)
+	
+	return json.dumps(list(database_recepie_names))
+
+	# return json.dumps(list(recepies))
 
 @app.route('/Siri/Matlista', methods=['GET'])
 def Matlista():	
+
 	recept = RECEPIES
+
 	weekday = 3
 	weekend = 2
 	nbrDishesPerWeek = weekday + weekend
@@ -346,24 +374,58 @@ def LiloPromenad():
 		conversion = str(timedelta(seconds=current_walk_time))
 		return "Totalt tid ute denna promenad med Lilo var: " + conversion
 
+def get_data(cursor, recepies):
+	try:
+		statement = "SELECT name, ingredients FROM Recepies WHERE id=%s"
+		ingredientList = []
+		recepieList = []
+		for recepie in recepies:
+			data = (recepie,)
+			cursor.execute(statement, data)
+			for (name, ingredients) in cursor:
+				ingredientList.append(ingredients)
+				recepieList.append(name)
+		return recepieList, ingredientList
+		# for (name) in cursor:
+		# 	print(f"Successfully retrieved {name}")	
+		# 	return {name}
+	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
+
+
+
 @app.route('/Siri/ReactRecepies', methods=['POST'])
 def ReactRecepies():
 		data = request.json
-		recepies = data.get("currentList")
+		recepies = data.get("idList")
+		print("RECEPIES: ", recepies)
+
+		try:
+			conn = mariadb.connect(
+				user=DB_USER,
+				password=DB_PASSWORD,
+				host=DB_HOST,
+				port=DB_PORT,
+				database=DB_DATABASE
+		)
+		except mariadb.Error as e:
+			print(f"Error connecting to MariaDB Platform: {e}")
+			sys.exit(1)
+		
+		# # Get Cursor
+		cur = conn.cursor()
+		data = get_data(cur, recepies)
+
 		dishList = []
 		dishListTmp = []
 		groceryList = []
-		for i in range(len(recepies)):
-			dishList.append(str(recepies[i][0][:-2]))
-			dishListTmp.append(str(recepies[i][0]))
-	
-		for i in range(len(recepies)):
-			for j in range(len(recepies[i])-1):
-				groceryList.append(str(recepies[i][j+1]))
-		print("DISHLIST", dishList)
-		print("GROCERY LIST", groceryList)
+		for i in range(len(data[0])):
+			dishList.append(data[0][i])
 
+		for i in range(len(data[1])):
+			groceryList.append(data[1][i])
+		print("GROCERY: ", type(groceryList))
 
+				
 		newListBread = []
 		newListDairies = []
 		newListSpices = []
@@ -564,7 +626,7 @@ def LiloStatusSpeech():
 		return "Idag ska Lilo få medicin, men jag har redan skrivit upp att hon fått medicin idag " + config['DEFAULT']['LAST_DATE']
 		
 	if date_time in futureMedicationDates: 
-		return ('Ja, idag ska Lilo få kortison. Lilo fick kortison senast ') + config['DEFAULT']['LAST_DATE'] + ('...När du gett henne medicin, säg Lilo fick medicin så skriver jag upp det')
+		return ('Ja, idag ska Lilo få kortison. Lilo fick kortison senast ') + config['DEFAULT']['LAST_DATE'] + ('...När du gett henne medicinnnnn, säg Lilo fick medicin så skriver jag upp det')
 	else: 
 	
 		return ('Nej, idag ska Lilo inte få kortison. Lilo fick kortison senast ') + config['DEFAULT']['LAST_DATE']
