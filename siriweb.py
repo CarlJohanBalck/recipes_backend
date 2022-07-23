@@ -40,7 +40,9 @@ from config import (
 	DB_PASSWORD,
 	DB_HOST,
 	DB_PORT,
-	DB_DATABASE
+	DB_DATABASE,
+	DB_QUERY_GET_ALL,
+	DB_QUERY_INGREDIENTS
 )
 hostname = socket.gethostname()
 isOnWalk = False
@@ -90,14 +92,24 @@ def getRecepies():
 
 	# Get Cursor
 	cur = conn.cursor()
-	cur.execute("SELECT name, id from Recepies")
-	database_recepie_names = []
-	for name in cur:
-		database_recepie_names.append(name)
-	
-	return json.dumps(list(database_recepie_names))
+	# cur.execute("SELECT name, id from Recepies")
 
-	# return json.dumps(list(recepies))
+	selectedRecepies = [1, 2, 3]
+	result = get_selected_recipe_db(cur, selectedRecepies)
+
+	all_recipe_result = get_all_recipe(cur, DB_QUERY_GET_ALL)
+	recipeNameList = []
+	print("ALL RECIPE RESULT: ", all_recipe_result)
+	# for i in range (len(all_recipe_result)):
+	# 	recipeNameList.append(all_recipe_result[i][1])
+	
+	# # print("RECIPE NAME LIST: ", recipeNameList)
+	# # print("RESULT-----: ", all_recipe_result[0][1])
+
+
+	database_recepie_names = []
+	
+	return json.dumps(list(all_recipe_result))
 
 @app.route('/Siri/Matlista', methods=['GET'])
 def Matlista():	
@@ -392,12 +404,34 @@ def get_data(cursor, recepies):
 	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
 
 
+def get_selected_recipe_db(cursor, selectedRecepies):
+	try:
+		statement = DB_QUERY_INGREDIENTS
+		ingredientList = []
+		for obj in selectedRecepies:
+			data = (obj,)
+			cursor.execute(statement, data)
+			for (ingredients) in cursor:
+				ingredientList.append(ingredients)
+		return ingredientList
+	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
+
+
+def get_all_recipe(cursor, query):
+	try:
+		recipeList = []
+		cursor.execute(query)
+		for (recipe) in cursor:
+			recipeList.append(recipe)
+		return recipeList
+	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
+
+
 
 @app.route('/Siri/ReactRecepies', methods=['POST'])
 def ReactRecepies():
 		data = request.json
 		recepies = data.get("idList")
-		print("RECEPIES: ", recepies)
 
 		try:
 			conn = mariadb.connect(
@@ -413,8 +447,8 @@ def ReactRecepies():
 		
 		# # Get Cursor
 		cur = conn.cursor()
-		data = get_data(cur, recepies)
-
+		data = get_selected_recipe_db(cur, recepies)
+		print("FINAL DATA----", type(data[0]))
 		dishList = []
 		dishListTmp = []
 		groceryList = []
