@@ -450,159 +450,22 @@ def ReactRecepies():
 		for i in range (len(data)):
 			groceryRow = str(data[i][0]) + " " + str(data[i][1]).replace('None', '') + " " + str(data[i][2])
 			newGroceryList.append(groceryRow)
-		print("GROCERY LIST: ", newGroceryList)
 		newDishList = dishListForSelectedRecipes(cur, recepies)
-		print("NEW DISH LIST: ", newDishList)
 
+
+		dishList = newDishList
+		groceryList = newGroceryList
 		
-		dishList = []
-		dishListTmp = []
-		groceryList = []
-		for i in range(len(data[0])):
-			dishList.append(data[0][i])
-
-		for i in range(len(data[1])):
-			groceryList.append(data[1][i])
-		print("GROCERY: ", type(groceryList))
-
-				
-		newListBread = []
-		newListDairies = []
-		newListSpices = []
-		newListFrozen = []
-		newListVegos = []
-		newListCheese = []
-		newListPasta = []
-		newListCheckout = []
-		newOtherList = []
-		print("GROCERY LIST LENGTH: ", len(groceryList))
-
-		## sort grocerylist into sub-category grocerylists
-
-		for x in groceryList:
-			if any(word in x.lower() for word in BREAD_CATEGORY):
-				newListBread.append(x)
-			elif any(word in x.lower() for word in DAIRY_CATEGORY):
-				newListDairies.append(x)
-			elif any(word in x.lower() for word in SPICES_CATEGORY):
-				newListSpices.append(x)
-			elif any(word in x.lower() for word in FROZEN_CATEGORY):
-				newListFrozen.append(x)
-			elif any(word in x.lower() for word in VEGETABLES_CATEGORY):
-				newListVegos.append(x)
-			elif any(word in x.lower() for word in CHEESE_CATEGORY):
-				newListCheese.append(x)
-			elif any(word in x.lower() for word in PASTA_CATEGORY):
-				newListPasta.append(x)
-			elif any(word in x.lower() for word in CHECKOUT_CATEGORY):
-				newListCheckout.append(x)
-			else:
-				newOtherList.append(x)
-		tmpList = []
-
-		for x in newListBread:
-			tmpList.append(x)
-		for x in newListDairies:
-			tmpList.append(x)
-		for x in newListSpices:
-			tmpList.append(x)
-		for x in newListFrozen:
-			tmpList.append(x)
-		for x in newListVegos:
-			tmpList.append(x)
-		for x in newListCheese:
-			tmpList.append(x)
-		for x in newListPasta:
-			tmpList.append(x)
-		for x in newListCheckout:
-			tmpList.append(x)
-		for x in newOtherList:
-			tmpList.append(x)
-
-		duplicates = [item for item, count in collections.Counter(tmpList).items() if count > 1]
-
-		duplicatesIndexList = []
-
-		for i in range(len(duplicates)):
-			duplicatesIndexList.append(indices(tmpList, duplicates[i]))
-
-		numberOfDuplicatesList = []
-		indexToRemoveList = []
-		firstIndexList = []
-
-		for i in range(len(duplicatesIndexList)):
-			numberOfDuplicatesList.append(len(duplicatesIndexList[i]))
-			indexToRemoveList.append(duplicatesIndexList[i][1:])
-			firstIndexList.append(duplicatesIndexList[i][0])
-
-		for i in range(len(firstIndexList)):
-			tmpList[firstIndexList[i]] = str(numberOfDuplicatesList[i]) + " x " + str(tmpList[firstIndexList[i]])
-		
-		for i in range(len(duplicates)):
-			tmpList.remove(duplicates[i])
-		
-		finalList = []
-		for x in tmpList:
-			finalList.append(x)
-			finalList.append("False")
-
-
-		now = datetime.now() # current date and time	
-		date_time = now.strftime("%d/%m/%Y")	
-		my_date = date.today()
-		dishDays = []
-
-		for i in range(len(recepies)):
-			td = timedelta(days=i+1)
-			dishDayTmp = now + td
-			dishDay = dishDayTmp.strftime("%d/%m/%Y")	
-			dishDays.append(str(dishDay))
-
-		dishDayList = list(zip(dishDays, dishListTmp))
-		# #init the calendar
-		# cal = Calendar()
-		# # Some properties are required to be compliant
-		# cal.add('prodid', '-//My calendar product//example.com//')
-		# cal.add('version', '2.0')
-
-		# for i in range(len(dishDayList)):
-		# 	# Add subcomponents
-		# 	event = Event()
-		# 	t = 0
-		# 	n = 1 # N. . .
-		# 	dishes = [x[n] for x in dishDayList]
-		# 	days = [x[t] for x in dishDayList]
-		# 	dateTmp = [int(d) for d in str(days[i]).split('/') if d.isdigit()]
-		# 	event.add('summary', dishes[i])
-		# 	event.add('dtstart', datetime(dateTmp[2], dateTmp[1], dateTmp[0], 16, 0, 0, tzinfo=pytz.utc))
-		# 	event.add('dtend', datetime(dateTmp[2], dateTmp[1], dateTmp[0], 17, 0, 0, tzinfo=pytz.utc))
-		# 	cal.add_component(event)
-		# #Write to disk
-		# directory = Path.cwd() / 'DishListCal'
-		# try:
-		# 	directory.mkdir(parents=True, exist_ok=True)
-		# except FileExistsError:
-		# 	print("Folder already exists")
-		# else:
-		# 	print("Folder was created")
-	
-		# f = open(os.path.join(directory, 'dishlist.ics'), 'wb')
-		# f.write(cal.to_ical())
-		# f.close()
-
-		priceList = 0
-
 		
 		f = open("grocerylist.txt", "w")
-		for i in range (len(finalList[::2])):
-			f.write(finalList[::2][i] + "\n")
+		for i in range (len(groceryList)):
+			f.write(groceryList[i] + "\n")
 		f.close()
 		t = open("dishlist.txt", "w")
 		for i in range (len(dishList)):
-			t.write(dishList[i] + "\n")
+			t.write(str(dishList[i]) + "\n")
 		t.close()
-		finalList.append(str(priceList))
-		return json.dumps(list(finalList[::2]))
+		return json.dumps(list(groceryList))
 
 @app.route('/Siri/PromenadSummary', methods=['GET'])
 def PromenadSummary():
