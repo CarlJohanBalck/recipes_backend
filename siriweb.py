@@ -92,22 +92,8 @@ def getRecepies():
 
 	# Get Cursor
 	cur = conn.cursor()
-	# cur.execute("SELECT name, id from Recepies")
-
-	selectedRecepies = [1, 2, 3]
-	result = get_selected_recipe_db(cur, selectedRecepies)
-
-	all_recipe_result = get_all_recipe(cur, DB_QUERY_GET_ALL)
-	recipeNameList = []
-	print("ALL RECIPE RESULT: ", all_recipe_result)
-	# for i in range (len(all_recipe_result)):
-	# 	recipeNameList.append(all_recipe_result[i][1])
 	
-	# # print("RECIPE NAME LIST: ", recipeNameList)
-	# # print("RESULT-----: ", all_recipe_result[0][1])
-
-
-	database_recepie_names = []
+	all_recipe_result = get_all_recipes(cur, DB_QUERY_GET_ALL)
 	
 	return json.dumps(list(all_recipe_result))
 
@@ -404,20 +390,32 @@ def get_data(cursor, recepies):
 	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
 
 
-def get_selected_recipe_db(cursor, selectedRecepies):
+def ingredients_for_recipe(cursor, selectedRecipes):
 	try:
-		statement = DB_QUERY_INGREDIENTS
+		selectedRecipes = str(tuple(selectedRecipes))
+		statement = "SELECT ri.amount AS 'Amount', un.name AS 'Unit of Measure', i.name AS 'Ingredient' FROM recipe r JOIN recipe_ingredient ri on r.id = ri.recipe_id JOIN ingredient i on i.id = ri.ingredient_id LEFT OUTER JOIN unit un on un.id = ri.unit_id WHERE r.id in" + " " + selectedRecipes + " " + "ORDER BY i.category_id;"
 		ingredientList = []
-		for obj in selectedRecepies:
-			data = (obj,)
-			cursor.execute(statement, data)
-			for (ingredients) in cursor:
-				ingredientList.append(ingredients)
+		cursor.execute(statement)
+
+		for (ingredients) in cursor:
+			ingredientList.append(ingredients)
 		return ingredientList
 	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
 
+def dishListForSelectedRecipes(cursor, selectedRecipes):
+	try:
+		selectedRecipes = str(tuple(selectedRecipes))
+		statement = "SELECT r.name AS 'Name', r.url AS 'URL' FROM recipe r WHERE r.id in" + " " + selectedRecipes;
+		dishList = []
+		cursor.execute(statement)
 
-def get_all_recipe(cursor, query):
+		for (dish) in cursor:
+			dishList.append(dish)
+		return dishList
+	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
+
+
+def get_all_recipes(cursor, query):
 	try:
 		recipeList = []
 		cursor.execute(query)
@@ -432,7 +430,7 @@ def get_all_recipe(cursor, query):
 def ReactRecepies():
 		data = request.json
 		recepies = data.get("idList")
-
+		
 		try:
 			conn = mariadb.connect(
 				user=DB_USER,
@@ -447,8 +445,16 @@ def ReactRecepies():
 		
 		# # Get Cursor
 		cur = conn.cursor()
-		data = get_selected_recipe_db(cur, recepies)
-		print("FINAL DATA----", type(data[0]))
+		newGroceryList = []
+		data = ingredients_for_recipe(cur, recepies)
+		for i in range (len(data)):
+			groceryRow = str(data[i][0]) + " " + str(data[i][1]).replace('None', '') + " " + str(data[i][2])
+			newGroceryList.append(groceryRow)
+		print("GROCERY LIST: ", newGroceryList)
+		newDishList = dishListForSelectedRecipes(cur, recepies)
+		print("NEW DISH LIST: ", newDishList)
+
+		
 		dishList = []
 		dishListTmp = []
 		groceryList = []
@@ -553,36 +559,36 @@ def ReactRecepies():
 			dishDays.append(str(dishDay))
 
 		dishDayList = list(zip(dishDays, dishListTmp))
-		#init the calendar
-		cal = Calendar()
-		# Some properties are required to be compliant
-		cal.add('prodid', '-//My calendar product//example.com//')
-		cal.add('version', '2.0')
+		# #init the calendar
+		# cal = Calendar()
+		# # Some properties are required to be compliant
+		# cal.add('prodid', '-//My calendar product//example.com//')
+		# cal.add('version', '2.0')
 
-		for i in range(len(dishDayList)):
-			# Add subcomponents
-			event = Event()
-			t = 0
-			n = 1 # N. . .
-			dishes = [x[n] for x in dishDayList]
-			days = [x[t] for x in dishDayList]
-			dateTmp = [int(d) for d in str(days[i]).split('/') if d.isdigit()]
-			event.add('summary', dishes[i])
-			event.add('dtstart', datetime(dateTmp[2], dateTmp[1], dateTmp[0], 16, 0, 0, tzinfo=pytz.utc))
-			event.add('dtend', datetime(dateTmp[2], dateTmp[1], dateTmp[0], 17, 0, 0, tzinfo=pytz.utc))
-			cal.add_component(event)
-		#Write to disk
-		directory = Path.cwd() / 'DishListCal'
-		try:
-			directory.mkdir(parents=True, exist_ok=True)
-		except FileExistsError:
-			print("Folder already exists")
-		else:
-			print("Folder was created")
+		# for i in range(len(dishDayList)):
+		# 	# Add subcomponents
+		# 	event = Event()
+		# 	t = 0
+		# 	n = 1 # N. . .
+		# 	dishes = [x[n] for x in dishDayList]
+		# 	days = [x[t] for x in dishDayList]
+		# 	dateTmp = [int(d) for d in str(days[i]).split('/') if d.isdigit()]
+		# 	event.add('summary', dishes[i])
+		# 	event.add('dtstart', datetime(dateTmp[2], dateTmp[1], dateTmp[0], 16, 0, 0, tzinfo=pytz.utc))
+		# 	event.add('dtend', datetime(dateTmp[2], dateTmp[1], dateTmp[0], 17, 0, 0, tzinfo=pytz.utc))
+		# 	cal.add_component(event)
+		# #Write to disk
+		# directory = Path.cwd() / 'DishListCal'
+		# try:
+		# 	directory.mkdir(parents=True, exist_ok=True)
+		# except FileExistsError:
+		# 	print("Folder already exists")
+		# else:
+		# 	print("Folder was created")
 	
-		f = open(os.path.join(directory, 'dishlist.ics'), 'wb')
-		f.write(cal.to_ical())
-		f.close()
+		# f = open(os.path.join(directory, 'dishlist.ics'), 'wb')
+		# f.write(cal.to_ical())
+		# f.close()
 
 		priceList = 0
 
@@ -806,5 +812,5 @@ def LiloFick():
 if __name__ == '__main__':
 	thread = Thread(target = LiloStatusLight)
 	thread.start()
-	app.run(debug=True, host=ip_address, port=PORT, use_reloader=False)
+	app.run(debug=True, host=ip_address, port=PORT, use_reloader=True)
 	
