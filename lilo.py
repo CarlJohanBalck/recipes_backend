@@ -61,7 +61,6 @@ def LiloAntalPromendater():
 
 	config.read('walks.ini')
 
-	print("LAST DATE: ", config['DEFAULT']['NBR_WALKS']) 
 	nbrWalks = config['DEFAULT']['NBR_WALKS']
 	totalTime = config['DEFAULT']['TOTAL_TIME']
 

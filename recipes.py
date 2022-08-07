@@ -77,16 +77,8 @@ def getRecepies():
 	cur = conn.cursor()
 
 	data = get_all_recipes(cur, DB_QUERY_GET_ALL)
-	
 
-	print("ALL RECIPE RESULT: ", data)
-	tmp_all_recipe_result_list = []
-	for i in range (len(data)):
-		
-		data_test = str(data[i][0]) + ", " + str(data[i][1]) + ", " + str(data[i][2]) + ", " + str(data[i][3]) + ", " + str(data[i][4])
-		tmp_all_recipe_result_list.append(data_test)
-	print("FINAÖ-----: ", tmp_all_recipe_result_list)
-	return json.dumps(list(tmp_all_recipe_result_list))
+	return json.dumps(list(data))
 
 
 
@@ -190,7 +182,6 @@ def Matlista():
 	duplicates = [item for item, count in collections.Counter(tmpList).items() if count > 1]
 
 	duplicatesIndexList = []
-
 	for i in range(len(duplicates)):
 		duplicatesIndexList.append(indices(tmpList, duplicates[i]))
 
@@ -361,7 +352,6 @@ def get_all_recipes(cursor, query):
 		recipeList = []
 		cursor.execute(query)
 		for (recipe) in cursor:
-			print("RECIPE IN CURSOR: ", recipe)
 
 			recipeList.append(recipe)
 		return recipeList
@@ -390,6 +380,7 @@ def ReactRecepies():
 		cur = conn.cursor()
 		newGroceryList = []
 		data = ingredients_for_recipe(cur, recepies)
+		print("DATA----", data)
 		for i in range (len(data)):
 			groceryRow = str(data[i][0]) + " " + str(data[i][1]).replace('None', '') + " " + str(data[i][2])
 			newGroceryList.append(groceryRow)
@@ -412,5 +403,5 @@ def ReactRecepies():
 
 
 if __name__ == '__main__':
-	app.run(debug=True, host=ip_address, port=PORT, use_reloader=True)
+    app.run(debug=True, host=ip_address, port=PORT, use_reloader=True)
 	
