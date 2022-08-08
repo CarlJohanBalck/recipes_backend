@@ -1,6 +1,7 @@
 import os
 import time
 from datetime import datetime, date, timedelta
+from tkinter import E
 from flask import Flask, request
 from flask_cors import CORS
 import socket
@@ -21,8 +22,109 @@ from config import (
 	IP_ADDRESS,
 	PORT
 )
+
 hostname = socket.gethostname()
 isOnWalk = False
+g = (0, 255, 0)
+
+e = (0, 0, 0)
+y = (0, 0, 0)
+
+b = (0,0,255)
+
+r = (255,0,0)
+blue = [
+	b, b, b, b, b, b, b, b,
+	b, b, b, b, b, b, b, b,
+	b, b, b, b, b, b, b, b,
+	b, b, b, b, b, b, b, b,
+	b, b, b, b, b, b, b, b,
+	b, b, b, b, b, b, b, b,
+	b, b, b, b, b, b, b, b,
+	b, b, b, b, b, b, b, b
+]
+smiley_face = [
+   y, y, y, y, y, y, y, y,
+   y, y, y, y, y, y, y, y,
+   y, b, b, y, y, b, b, y,
+   y, b, b, y, y, b, b, y,
+   y, y, y, y, y, y, y, y,
+   y, b, b, y, y, b, b, y,
+   y, y, y, b, b, y, y, y,
+   y, y, y, y, y, y, y, y
+]
+
+green_one = [
+	e, e, e, g, g, e, e, e,
+	e, g, g, g, g, e, e, e,
+	e, g, g, g, g, e, e, e,
+	e, e, e, g, g, e, e, e,
+	e, e, e, g, g, e, e, e,
+	e, e, e, g, g, e, e, e,
+	e, e, e, g, g, e, e, e,
+	e, e, e, g, g, e, e, e
+]
+green_two = [
+	e, g, g, g, g, g, e, e,
+	e, g, g, g, g, g, e, e,
+	e, e, e, g, g, g, e, e,
+	e, e, e, g, g, g, e, e,
+	e, g, g, g, g, e, e, e,
+	e, g, g, e, e, e, e, e,
+	e, g, g, g, g, g, e, e,
+	e, g, g, g, g, g, e, e
+]
+green_three = [
+	e, g, g, g, g, g, e, e,
+	e, g, g, g, g, g, e, e,
+	e, e, e, e, g, g, e, e,
+	e, g, g, g, g, g, e, e,
+	e, g, g, g, g, g, e, e,
+	e, e, e, e, g, g, e, e,
+	e, g, g, g, g, g, e, e,
+	e, g, g, g, g, g, e, e
+]
+green_four = [
+	e, e, e, g, g, e, e, e,
+	e, g, g, g, g, e, e, e,
+	e, g, g, g, g, e, e, e,
+	e, e, e, g, g, e, e, e,
+	e, e, e, g, g, e, e, e,
+	e, e, e, g, g, e, e, e,
+	e, e, e, g, g, e, e, e,
+	e, e, e, g, g, e, e, e
+]
+
+red_one = [
+	e, e, e, r, r, e, e, e,
+	e, r, r, r, r, e, e, e,
+	e, r, r, r, r, e, e, e,
+	e, e, e, r, r, e, e, e,
+	e, e, e, r, r, e, e, e,
+	e, e, e, r, r, e, e, e,
+	e, e, e, r, r, e, e, e,
+	e, e, e, r, r, e, e, e
+]
+red_two = [
+	e, r, r, r, r, r, e, e,
+	e, r, r, r, r, r, e, e,
+	e, e, e, r, r, r, e, e,
+	e, e, e, r, r, r, e, e,
+	e, r, r, r, r, e, e, e,
+	e, r, r, e, e, e, e, e,
+	e, r, r, r, r, r, e, e,
+	e, r, r, r, r, r, e, e
+]
+red_three = [
+	e, r, r, r, r, r, e, e,
+	e, r, r, r, r, r, e, e,
+	e, e, e, e, r, r, e, e,
+	e, r, r, r, r, r, e, e,
+	e, r, r, r, r, r, e, e,
+	e, e, e, e, r, r, e, e,
+	e, r, r, r, r, r, e, e,
+	e, r, r, r, r, r, e, e
+]
 
 hasBeenGiven = False
 
@@ -32,6 +134,8 @@ CORS(app)
 
 print('\n Hostname of your Pi: ' + hostname)
 print(' IP address of Pi: ' + ip_address)
+
+sense = SenseHat()
 
 @app.route('/Siri/Senast', methods=['GET'])
 def LiloSenast():
@@ -148,7 +252,7 @@ def PromenadSummary():
 	return "Senaste tid ute med lilo var " + conversion_current_walk_time + "...Totalt antal promenader är " + str(nbr_walks) + " stycken." + "...Total tid ute med lilo är " + conversion_total_time
 
 def first2(s):
-    return s[:2]
+	return s[:2]
 
 def getEverySecondDateInFuture(date):
 	parsedDate = datetime.strptime(date, "%d/%m/%Y").date()
@@ -169,7 +273,6 @@ def LiloStatusSpeech():
 	now = datetime.now() # current date and time	
 	date_time = now.strftime("%d/%m/%Y")
 	my_date = date.today()
-	sense = SenseHat()
 	weekday = calendar.day_name[my_date.weekday()]
 	last_date = config['DEFAULT']['LAST_DATE']
 	last_date_parsed = last_date.split(" ")[1]
@@ -200,14 +303,20 @@ def LiloStatusSpeech():
 	else: 
 	
 		return ('Nej, idag ska Lilo inte få kortison. Lilo fick kortison senast ') + config['DEFAULT']['LAST_DATE']
-	
+
+
+def received_medicine(event):
+	if event.action == 'pressed':
+		
+		LiloFick()
+		
 def LiloStatusLight():
+	print("START LILO STATUS LIGHT")
 	config = configparser.ConfigParser()
 	config.read('lastDate.ini')
 	now = datetime.now() # current date and time	
 	date_time = now.strftime("%d/%m/%Y")
 	my_date = date.today()
-	sense = SenseHat()
 	weekday = calendar.day_name[my_date.weekday()]
 	last_date = config['DEFAULT']['LAST_DATE']
 	last_date_parsed = last_date.split(" ")[1]
@@ -233,12 +342,12 @@ def LiloStatusLight():
 		
 	if date_time in futureMedicationDates: 
 		while True:
+			sense.stick.direction_middle = received_medicine
 			try:
-				r = 0
-				g = 255
-				b = 0
-				sense.clear((r, g, b))
-				time.sleep(2)
+				# sense.clear((r, g, b))
+				config = configparser.ConfigParser()
+				config.read('lastDate.ini')
+				# time.sleep(2)
 				lastDate = config['DEFAULT']['LAST_DATE'].split(' ', 1)[1]
 				now = datetime.now() # current date and time	
 				date_time = now.strftime("%d/%m/%Y")	
@@ -246,27 +355,41 @@ def LiloStatusLight():
 				a = datetime.strptime(date_time, date_format)
 				b = datetime.strptime(lastDate, date_format)
 				delta = a - b
+				sense.set_rotation(180)
 
-				for i in range (delta.days):
-					sense.clear((0, 0, 0))
-					time.sleep(0.2)
-					sense.clear((0, 255, 0))
-					time.sleep(0.2)
-					sense.clear((0, 0, 0))
+				number = 0
+
+
+				if(delta.days == 1):
+					number = green_one
+				elif (delta.days == 2):
+					number = green_two
+				elif (delta.days == 3):
+					number = green_three
+				elif(delta.days == 0):
+					number = smiley_face
+
+				sense.set_pixels(number)
+
+				# for i in range (delta.days):
+				# 	sense.clear((0, 0, 0))
+				# 	time.sleep(0.2)
+				# 	sense.set_pixels(number)
+				# 	time.sleep(0.2)
+				# 	sense.clear((0, 0, 0))
 								
 				
 			except AttributeError:
+				print("ATTRIBUTE ERROR")
 				time.sleep(2)
 				continue
 
 	else: 
 		while True:
+			sense.stick.direction_middle = received_medicine
 			try:
-				r = 255
-				g = 0
-				b = 0
-				sense.clear((r, g, b))
-				time.sleep(2)
+				config = configparser.ConfigParser()
+				config.read('lastDate.ini')
 				lastDate = config['DEFAULT']['LAST_DATE'].split(' ', 1)[1]
 				now = datetime.now() # current date and time	
 				date_time = now.strftime("%d/%m/%Y")	
@@ -274,32 +397,26 @@ def LiloStatusLight():
 				a = datetime.strptime(date_time, date_format)
 				b = datetime.strptime(lastDate, date_format)
 				delta = a - b
+				sense.set_rotation(180)
 
-				for i in range (delta.days):
-					sense.clear((0, 0, 0))
-					time.sleep(0.2)
-					sense.clear((255, 0, 0))
-					time.sleep(0.2)
-					sense.clear((0, 0, 0))
-								
+				number = 0
+
+
+				if(delta.days == 1):
+					number = red_one
+				elif (delta.days == 2):
+					number = red_two
+				elif (delta.days == 3):
+					number = red_three
+				elif(delta.days == 0):
+					number = smiley_face
+
+				sense.set_pixels(number)
 				
 			except AttributeError:
 				time.sleep(2)
 				continue
-		# r = 255
-		# g = 0
-		# b = 0
-
-		# sense.clear((r, g, b))
-		# time.sleep(0.5)
-		# sense.clear((0, 255, 0))
-		# time.sleep(0.5)
-		# sense.clear((0, 0, 0))
-		# time.sleep(0.5)
-		# sense.clear((0, 0, 0))
-		# time.sleep(0.5)
-		
-		# return ('Nej, idag ska Lilo inte få kortison. Lilo fick kortison senast ') + config['DEFAULT']['LAST_DATE']
+	
 	
 
 @app.route('/Siri/LiloFick', methods=['POST'])
@@ -332,15 +449,14 @@ def LiloFick():
 	if (match == config['DEFAULT']['LAST_DATE']):
 		return "Jag har redan skrivit upp att Lilo fick medicin idag " + config['DEFAULT']['LAST_DATE']
 	else: 
-		hasBeenGiven = True
 		config['DEFAULT']['LAST_DATE'] = veckodag + " " + date_time
 		with open('lastDate.ini', 'w') as configfile:
 			config.write(configfile)
-		sense.clear((r, g, b))
+		sense.set_pixels(smiley_face)
 		return "Då noterar jag att Lilo fick medicin " + veckodag + " den " + date_time
 
 if __name__ == '__main__':
 	thread = Thread(target = LiloStatusLight)
 	thread.start()
-	app.run(debug=True, host=ip_address, port=PORT, use_reloader=True)
+	app.run(debug=True, host=ip_address, port=PORT, use_reloader=False)
 	

@@ -21,6 +21,8 @@ import json
 import mysql.connector as mariadb;
 from decimal import *
 from threading import Thread
+from random import choice
+
 
 
 from config import (
@@ -57,10 +59,50 @@ CORS(app)
 print('\n Hostname of your Pi: ' + hostname)
 print(' IP address of Pi: ' + ip_address)
 
+@app.route('/Siri/MatlistaTest', methods=['POST'])
+def MatlistaTest():
+		data = request.json
+		numberOfDishes = data.get("numberOfDishes")
+		try:
+			conn = mariadb.connect(
+				user=DB_USER,
+				password=DB_PASSWORD,
+				host=DB_HOST,
+				port=DB_PORT,
+				database=DB_DATABASE
+		)
+		except mariadb.Error as e:
+			print(f"Error connecting to MariaDB Platform: {e}")
+			sys.exit(1)
+		
+		# # Get Cursor
+		cur = conn.cursor()
+		newGroceryList = []
+
+		allRecipes = get_all_recipes(cur, DB_QUERY_GET_ALL)
+		
+		n = 0
+
+		r = range(n+1, len(allRecipes))
+
+		data = random.sample(r, numberOfDishes)
+
+		newDishList = []
+		
+		ingredients = ingredients_for_recipe(cur, data)
+		for i in range (len(ingredients)):
+			groceryRow = str(ingredients[i][0]) + " " + str(ingredients[i][1]).replace('None', '') + " " + str(ingredients[i][2])
+			newGroceryList.append(groceryRow)
+	
+		newDishList = dishListForSelectedRecipes(cur, data)
+
+		
+		return json.dumps(list(newDishList))
+
+
 
 @app.route('/Siri/Recepies', methods=['GET'])
 def getRecepies():
-	# recepies = RECEPIES
 	try:
 		conn = mariadb.connect(
 			user=DB_USER,
@@ -75,21 +117,36 @@ def getRecepies():
 
 	# Get Cursor
 	cur = conn.cursor()
-
 	data = get_all_recipes(cur, DB_QUERY_GET_ALL)
+
+
+
 
 	return json.dumps(list(data))
 
 
-
-
 @app.route('/Siri/Matlista', methods=['GET'])
 def Matlista():	
+	
+	try:
+		conn = mariadb.connect(
+			user=DB_USER,
+			password=DB_PASSWORD,
+			host=DB_HOST,
+			port=DB_PORT,
+			database=DB_DATABASE
+		)
+	except mariadb.Error as e:
+		print(f"Error connecting to MariaDB Platform: {e}")
+		sys.exit(1)
 
-	recept = RECEPIES
+	# Get Cursor
+	cur = conn.cursor()
+	data = get_all_recipes(cur, DB_QUERY_GET_ALL)
+	recept = data
 
-	weekday = 3
-	weekend = 2
+	weekday = 1
+	weekend = 1
 	nbrDishesPerWeek = weekday + weekend
 	nbrRecepies = len(recept)
 	final_recepie = []
@@ -102,10 +159,11 @@ def Matlista():
 	weekend_list = []
 
 	for i in range (len(recept)):
-		if recept[i][0][-1] == "h":
+		if recept[i][3] == 1:
 			weekend_list.append(recept[i])
-		elif recept[i][0][-1] == "v":
+		elif recept[i][3] == 0:
 			weekday_list.append(recept[i])
+	
 
 	randomlist_weekday = random.sample(range(len(weekday_list)), weekday)
 	randomlist_weekend = random.sample(range(len(weekend_list)), weekend)
@@ -117,9 +175,9 @@ def Matlista():
 	
 
 	for i in range(nbrDishesPerWeek):
-		dishList.append(str(final_recepie[i][0][:-2]))
-		dishList.append("False")
-		dishListTmp.append(str(final_recepie[i][0]))
+		dishList.append(str(final_recepie[i][2]))
+		# dishList.append("False")
+		# dishListTmp.append(str(final_recepie[i][0]))
 	
 
 	for i in range(nbrDishesPerWeek):
@@ -324,8 +382,11 @@ def get_data(cursor, recepies):
 
 def ingredients_for_recipe(cursor, selectedRecipes):
 	try:
-		selectedRecipes = str(tuple(selectedRecipes))
-		statement = "SELECT ri.amount AS 'Amount', un.name AS 'Unit of Measure', i.name AS 'Ingredient' FROM recipe r JOIN recipe_ingredient ri on r.id = ri.recipe_id JOIN ingredient i on i.id = ri.ingredient_id LEFT OUTER JOIN unit un on un.id = ri.unit_id WHERE r.id in" + " " + selectedRecipes + " " + "ORDER BY i.category_id;"
+		selectedRecipesParsed = str(tuple(selectedRecipes))
+		if len(selectedRecipes) == 1:
+			selectedRecipesParsed = selectedRecipesParsed.replace(',', "")
+		statement = "SELECT cast(ri.amount as VARCHAR(30)) AS 'Amount', un.name AS 'Unit of Measure', i.name AS 'Ingredient' FROM recipe r JOIN recipe_ingredient ri on r.id = ri.recipe_id JOIN ingredient i on i.id = ri.ingredient_id LEFT OUTER JOIN unit un on un.id = ri.unit_id WHERE r.id in" + " " + selectedRecipesParsed + " " + "ORDER BY i.category_id;"
+		print("STATEMENT: ", statement)
 		ingredientList = []
 		cursor.execute(statement)
 
@@ -337,7 +398,7 @@ def ingredients_for_recipe(cursor, selectedRecipes):
 def dishListForSelectedRecipes(cursor, selectedRecipes):
 	try:
 		selectedRecipes = str(tuple(selectedRecipes))
-		statement = "SELECT r.name AS 'Name', r.url AS 'URL' FROM recipe r WHERE r.id in" + " " + selectedRecipes;
+		statement = "SELECT r.name AS 'Name', r.url AS 'URL' FROM recipes_view r WHERE r.id in" + " " + selectedRecipes;
 		dishList = []
 		cursor.execute(statement)
 
@@ -359,10 +420,13 @@ def get_all_recipes(cursor, query):
 
 
 
+
 @app.route('/Siri/ReactRecepies', methods=['POST'])
 def ReactRecepies():
-		data = request.json
-		recepies = data.get("idList")
+
+		request_data = request.json
+		print("REQUEST DATA: ", request_data)
+		recepies = request_data.get("idList")
 		
 		try:
 			conn = mariadb.connect(
@@ -379,13 +443,14 @@ def ReactRecepies():
 		# # Get Cursor
 		cur = conn.cursor()
 		newGroceryList = []
+		
 		data = ingredients_for_recipe(cur, recepies)
-		print("DATA----", data)
+		test = []
 		for i in range (len(data)):
 			groceryRow = str(data[i][0]) + " " + str(data[i][1]).replace('None', '') + " " + str(data[i][2])
 			newGroceryList.append(groceryRow)
 		newDishList = dishListForSelectedRecipes(cur, recepies)
-
+		
 
 		dishList = newDishList
 		groceryList = newGroceryList
