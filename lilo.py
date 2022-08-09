@@ -85,14 +85,14 @@ green_three = [
 	e, g, g, g, g, g, e, e
 ]
 green_four = [
-	e, e, e, g, g, e, e, e,
-	e, g, g, g, g, e, e, e,
-	e, g, g, g, g, e, e, e,
-	e, e, e, g, g, e, e, e,
-	e, e, e, g, g, e, e, e,
-	e, e, e, g, g, e, e, e,
-	e, e, e, g, g, e, e, e,
-	e, e, e, g, g, e, e, e
+	e, g, g, e, e, g, g, e,
+	e, g, g, e, e, g, g, e,
+	e, g, g, g, g, g, g, e,
+	e, g, g, g, g, g, g, e,
+	e, e, e, e, e, g, g, e,
+	e, e, e, e, e, g, g, e,
+	e, e, e, e, e, g, g, e,
+	e, e, e, e, e, g, g, e
 ]
 
 red_one = [
@@ -124,6 +124,16 @@ red_three = [
 	e, e, e, e, r, r, e, e,
 	e, r, r, r, r, r, e, e,
 	e, r, r, r, r, r, e, e
+]
+red_four = [
+	e, r, r, e, e, r, r, e,
+	e, r, r, e, e, r, r, e,
+	e, r, r, r, r, r, r, e,
+	e, r, r, r, r, r, r, e,
+	e, e, e, e, e, r, r, e,
+	e, e, e, e, e, r, r, e,
+	e, e, e, e, e, r, r, e,
+	e, e, e, e, e, r, r, e
 ]
 
 hasBeenGiven = False
@@ -159,35 +169,35 @@ def indices(lst, item):
 
 
 	
-@app.route('/Siri/AntalPromenader', methods=['GET'])
-def LiloAntalPromendater():
-	config = configparser.ConfigParser()
+# @app.route('/Siri/AntalPromenader', methods=['GET'])
+# def LiloAntalPromendater():
+# 	config = configparser.ConfigParser()
 
-	config.read('walks.ini')
+# 	config.read('walks.ini')
 
-	nbrWalks = config['DEFAULT']['NBR_WALKS']
-	totalTime = config['DEFAULT']['TOTAL_TIME']
+# 	nbrWalks = config['DEFAULT']['NBR_WALKS']
+# 	totalTime = config['DEFAULT']['TOTAL_TIME']
 
-	return "Lilo har gått " + " " + nbrWalks + " promenader " + "sedan 7e mars 2022. Hon har även varit ute i " + totalTime + " sekunder"
+# 	return "Lilo har gått " + " " + nbrWalks + " promenader " + "sedan 7e mars 2022. Hon har även varit ute i " + totalTime + " sekunder"
  
 
-def StartTimer(config):
-	t = Timer()
-	t.start()
+# def StartTimer(config):
+# 	t = Timer()
+# 	t.start()
 	
-	while isOnWalk == True:
-		time.sleep(1)
-		print("TIMER COUNTING....")
-	else: 
-		print("TIMER STOPPED....")
-		resultTime = t.stop()	
-		retultTimeInt = int(resultTime)
-		timeOutAlready = int(config['DEFAULT']['TOTAL_TIME'])
-		totalTime = timeOutAlready + retultTimeInt
-		config['DEFAULT']['CURRENT_WALK_TIME'] = str(retultTimeInt)
-		config['DEFAULT']['TOTAL_TIME'] = str(totalTime)
-		with open('walks.ini', 'w') as configfile:
-			config.write(configfile)
+# 	while isOnWalk == True:
+# 		time.sleep(1)
+# 		print("TIMER COUNTING....")
+# 	else: 
+# 		print("TIMER STOPPED....")
+# 		resultTime = t.stop()	
+# 		retultTimeInt = int(resultTime)
+# 		timeOutAlready = int(config['DEFAULT']['TOTAL_TIME'])
+# 		totalTime = timeOutAlready + retultTimeInt
+# 		config['DEFAULT']['CURRENT_WALK_TIME'] = str(retultTimeInt)
+# 		config['DEFAULT']['TOTAL_TIME'] = str(totalTime)
+# 		with open('walks.ini', 'w') as configfile:
+# 			config.write(configfile)
 
 @app.route('/Siri/Promenad', methods=['POST'])
 def LiloPromenad():
@@ -238,18 +248,18 @@ def get_data(cursor, recepies):
 
 
 
-@app.route('/Siri/PromenadSummary', methods=['GET'])
-def PromenadSummary():
-	config = configparser.ConfigParser()
-	config.read('walks.ini')
-	current_walk_time = int(config.get("DEFAULT", "current_walk_time"))
-	nbr_walks = int(config.get("DEFAULT", "nbr_walks"))
-	total_time = int(config.get("DEFAULT", "total_time"))
+# @app.route('/Siri/PromenadSummary', methods=['GET'])
+# def PromenadSummary():
+# 	config = configparser.ConfigParser()
+# 	config.read('walks.ini')
+# 	current_walk_time = int(config.get("DEFAULT", "current_walk_time"))
+# 	nbr_walks = int(config.get("DEFAULT", "nbr_walks"))
+# 	total_time = int(config.get("DEFAULT", "total_time"))
 
-	conversion_current_walk_time = str(timedelta(seconds=current_walk_time))
+# 	conversion_current_walk_time = str(timedelta(seconds=current_walk_time))
 
-	conversion_total_time = str(timedelta(seconds=total_time))
-	return "Senaste tid ute med lilo var " + conversion_current_walk_time + "...Totalt antal promenader är " + str(nbr_walks) + " stycken." + "...Total tid ute med lilo är " + conversion_total_time
+# 	conversion_total_time = str(timedelta(seconds=total_time))
+# 	return "Senaste tid ute med lilo var " + conversion_current_walk_time + "...Totalt antal promenader är " + str(nbr_walks) + " stycken." + "...Total tid ute med lilo är " + conversion_total_time
 
 def first2(s):
 	return s[:2]
@@ -316,38 +326,16 @@ def LiloStatusLight():
 	config.read('lastDate.ini')
 	now = datetime.now() # current date and time	
 	date_time = now.strftime("%d/%m/%Y")
-	my_date = date.today()
-	weekday = calendar.day_name[my_date.weekday()]
 	last_date = config['DEFAULT']['LAST_DATE']
 	last_date_parsed = last_date.split(" ")[1]
 	futureMedicationDates = getEverySecondDateInFuture(last_date_parsed)
 
-	if(weekday == "Sunday"):
-		veckodag = "Söndag"
-	if(weekday == "Monday"):
-		veckodag = "Måndag"
-	if(weekday == "Tuesday"):
-		veckodag = "Tisdag"
-	if(weekday == "Wednesday"):
-		veckodag = "Onsdag"
-	if(weekday == "Thursday"):
-		veckodag = "Torsdag"
-	if(weekday == "Friday"):
-		veckodag = "Fredag"
-	if(weekday == "Saturday"):
-		veckodag = "Lördag"
-
-	match = veckodag + " " + date_time
-	
-		
 	if date_time in futureMedicationDates: 
 		while True:
 			sense.stick.direction_middle = received_medicine
 			try:
-				# sense.clear((r, g, b))
 				config = configparser.ConfigParser()
 				config.read('lastDate.ini')
-				# time.sleep(2)
 				lastDate = config['DEFAULT']['LAST_DATE'].split(' ', 1)[1]
 				now = datetime.now() # current date and time	
 				date_time = now.strftime("%d/%m/%Y")	
@@ -359,26 +347,19 @@ def LiloStatusLight():
 
 				number = 0
 
-
 				if(delta.days == 1):
 					number = green_one
 				elif (delta.days == 2):
 					number = green_two
 				elif (delta.days == 3):
 					number = green_three
+				elif (delta.days == 4):
+					number = green_four
 				elif(delta.days == 0):
 					number = smiley_face
 
 				sense.set_pixels(number)
 
-				# for i in range (delta.days):
-				# 	sense.clear((0, 0, 0))
-				# 	time.sleep(0.2)
-				# 	sense.set_pixels(number)
-				# 	time.sleep(0.2)
-				# 	sense.clear((0, 0, 0))
-								
-				
 			except AttributeError:
 				print("ATTRIBUTE ERROR")
 				time.sleep(2)
@@ -398,16 +379,15 @@ def LiloStatusLight():
 				b = datetime.strptime(lastDate, date_format)
 				delta = a - b
 				sense.set_rotation(180)
-
 				number = 0
-
-
 				if(delta.days == 1):
 					number = red_one
 				elif (delta.days == 2):
 					number = red_two
 				elif (delta.days == 3):
 					number = red_three
+				elif (delta.days == 4):
+					number = red_four
 				elif(delta.days == 0):
 					number = smiley_face
 
@@ -418,7 +398,6 @@ def LiloStatusLight():
 				continue
 	
 	
-
 @app.route('/Siri/LiloFick', methods=['POST'])
 def LiloFick():
 	now = datetime.now() # current date and time	
@@ -441,9 +420,7 @@ def LiloFick():
 		veckodag = "Fredag"
 	if(weekday == "Saturday"):
 		veckodag = "Lördag"
-	r = 0
-	g = 0
-	b = 255
+	
 	config.read('lastDate.ini')
 	match = veckodag + " " + date_time
 	if (match == config['DEFAULT']['LAST_DATE']):
