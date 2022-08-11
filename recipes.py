@@ -20,7 +20,10 @@ from config import (
 	DB_HOST,
 	DB_PORT,
 	DB_DATABASE,
-	DB_QUERY_GET_ALL
+	DB_QUERY_GET_ALL,
+	DB_QUERY_GET_DISH_LIST,
+	DB_QUERY_INGREDIENTS_1,
+	DB_QUERY_INGREDIENTS_2
 )
 hostname = socket.gethostname()
 isOnWalk = False
@@ -39,7 +42,7 @@ def MatlistaTest():
 		data = request.json
 		numberOfDishes = data.get("numberOfDishes")
 		keep = gkeepapi.Keep()
-		success = keep.login(KEEP_EMAIL, KEEP_PASSWORD)
+		keep.login(KEEP_EMAIL, KEEP_PASSWORD)
 		
 		try:
 			conn = mariadb.connect(
@@ -78,8 +81,6 @@ def MatlistaTest():
 		
 		return json.dumps(list(newDishList))
 
-
-
 @app.route('/Siri/Recepies', methods=['GET'])
 def getRecepies():
 	try:
@@ -110,7 +111,7 @@ def ingredients_for_recipe(cursor, selectedRecipes):
 		selectedRecipesParsed = str(tuple(selectedRecipes))
 		if len(selectedRecipes) == 1:
 			selectedRecipesParsed = selectedRecipesParsed.replace(',', "")
-		statement = "SELECT cast(ri.amount as VARCHAR(30)) AS 'Amount', un.name AS 'Unit of Measure', i.name AS 'Ingredient' FROM recipe r JOIN recipe_ingredient ri on r.id = ri.recipe_id JOIN ingredient i on i.id = ri.ingredient_id LEFT OUTER JOIN unit un on un.id = ri.unit_id WHERE r.id in" + " " + selectedRecipesParsed + " " + "ORDER BY i.category_id;"
+		statement = DB_QUERY_INGREDIENTS_1 + " " + selectedRecipesParsed + " " + DB_QUERY_INGREDIENTS_2
 		ingredientList = []
 		cursor.execute(statement)
 
@@ -122,7 +123,7 @@ def ingredients_for_recipe(cursor, selectedRecipes):
 def dishListForSelectedRecipes(cursor, selectedRecipes):
 	try:
 		selectedRecipes = str(tuple(selectedRecipes))
-		statement = "SELECT r.name AS 'Name', r.url AS 'URL' FROM recipes_view r WHERE r.id in" + " " + selectedRecipes;
+		statement = DB_QUERY_GET_DISH_LIST + " " + selectedRecipes;
 		dishList = []
 		cursor.execute(statement)
 
@@ -152,7 +153,7 @@ def ReactRecepies():
 		recepies = request_data.get("idList")
 
 		keep = gkeepapi.Keep()
-		success = keep.login(KEEP_EMAIL, KEEP_PASSWORD)
+		keep.login(KEEP_EMAIL, KEEP_PASSWORD)
 		
 		try:
 			conn = mariadb.connect(
@@ -206,19 +207,16 @@ def ReactRecepies():
 		for i in range(len(gnotes)):
 			if gnotes[i].title == string_ingredients or gnotes[i].title == string_dishes:
 				gnotes[i].delete()
-
-		glist = keep.createList('Inköpslista PI - ' + date_time, 
+		keep.createList('Inköpslista PI - ' + date_time, 
 			grocery_list_tuple
 		)
-		glist = keep.createList('Matlista PI - ' + date_time, 
+		keep.createList('Matlista PI - ' + date_time, 
 			dish_list_tuple
 		)
 
-	
 		keep.sync()
 			
-		
-		return "TEST"
+		return json.dumps(list(grocery_list_tuple))
 
 
 if __name__ == '__main__':
