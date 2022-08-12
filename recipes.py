@@ -81,7 +81,7 @@ def MatlistaTest():
 		
 		return json.dumps(list(newDishList))
 
-@app.route('/Siri/Recepies', methods=['GET'])
+@app.route('/Siri/Recipes', methods=['GET'])
 def getRecepies():
 	try:
 		conn = mariadb.connect(
@@ -93,7 +93,6 @@ def getRecepies():
 		)
 	except mariadb.Error as e:
 		print(f"Error connecting to MariaDB Platform: {e}")
-		sys.exit(1)
 
 	# Get Cursor
 	cur = conn.cursor()
@@ -122,8 +121,10 @@ def ingredients_for_recipe(cursor, selectedRecipes):
 
 def dishListForSelectedRecipes(cursor, selectedRecipes):
 	try:
-		selectedRecipes = str(tuple(selectedRecipes))
-		statement = DB_QUERY_GET_DISH_LIST + " " + selectedRecipes;
+		selectedRecipesParsed = str(tuple(selectedRecipes))
+		if len(selectedRecipes) == 1:
+			selectedRecipesParsed = selectedRecipesParsed.replace(',', "")
+		statement = DB_QUERY_GET_DISH_LIST + " " + selectedRecipesParsed;
 		dishList = []
 		cursor.execute(statement)
 
@@ -146,12 +147,11 @@ def get_all_recipes(cursor, query):
 
 
 
-@app.route('/Siri/ReactRecepies', methods=['POST'])
+@app.route('/Siri/ReactRecipes', methods=['POST'])
 def ReactRecepies():
 
 		request_data = request.json
 		recepies = request_data.get("idList")
-
 		keep = gkeepapi.Keep()
 		keep.login(KEEP_EMAIL, KEEP_PASSWORD)
 		
