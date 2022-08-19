@@ -1,4 +1,5 @@
 from datetime import datetime, date, timedelta
+from tkinter import INSERT
 from flask import Flask, request
 from flask_cors import CORS
 import socket
@@ -7,7 +8,7 @@ import gkeepapi
 import json
 import mysql.connector as mariadb;
 from decimal import *
-
+import re
 
 
 from config import (
@@ -103,7 +104,19 @@ def getRecepies():
 
 	return json.dumps(list(data))
 
+def instructions_for_book_recipes(cursor, selectedRecipes):
+	try:
+		selectedRecipesParsed = str(tuple(selectedRecipes))
+		if len(selectedRecipes) == 1:
+			selectedRecipesParsed = selectedRecipesParsed.replace(',', "")
+		statement = "SELECT instructions, name from recipe where id in " + selectedRecipesParsed + " and instructions IS NOT NULL"
+		instructionList = []
+		cursor.execute(statement)
 
+		for (instruction) in cursor:
+			instructionList.append(instruction)
+		return instructionList
+	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
 
 def ingredients_for_recipe(cursor, selectedRecipes):
 	try:
@@ -151,7 +164,7 @@ def get_all_recipes(cursor, query):
 def ReactRecepies():
 
 		request_data = request.json
-		recepies = request_data.get("idList")
+		recipes = request_data.get("idList")
 		keep = gkeepapi.Keep()
 		keep.login(KEEP_EMAIL, KEEP_PASSWORD)
 		
@@ -171,11 +184,14 @@ def ReactRecepies():
 		cur = conn.cursor()
 		newGroceryList = []
 		
-		ingredients = ingredients_for_recipe(cur, recepies)
+
+		ingredients = ingredients_for_recipe(cur, recipes)
+		instructions = instructions_for_book_recipes(cur, recipes)
+
 		for i in range (len(ingredients)):
 			groceryRow = str(ingredients[i][0]) + " " + str(ingredients[i][1]).replace('None', '') + " " + str(ingredients[i][2])
 			newGroceryList.append(groceryRow)
-		dishes = dishListForSelectedRecipes(cur, recepies)
+		dishes = dishListForSelectedRecipes(cur, recipes)
 		dishList = []
 		newDishList = []
 		for i in range (len(dishes)):
@@ -184,8 +200,7 @@ def ReactRecepies():
 		for i in range(len(newDishList)):
 			dishList.append(newDishList[i])
 			dishList.append("False")
-		
-		
+	
 		dish_list_tuple = [x for x in zip(*[iter(dishList)]*2)]
 
 		testList = []
@@ -199,11 +214,14 @@ def ReactRecepies():
 		now = datetime.now() # current date and time	
 		date_time = now.strftime("%d/%m/%Y")	
 
+	
 		gnotes = keep.all()
 		string_ingredients = 'Inköpslista PI - ' + date_time
 		string_dishes = 'Matlista PI - ' + date_time
 
-		
+		for i in range(len(instructions)):
+			keep.createNote(instructions[i][1], instructions[i][0])
+
 		for i in range(len(gnotes)):
 			if gnotes[i].title == string_ingredients or gnotes[i].title == string_dishes:
 				gnotes[i].delete()
