@@ -24,7 +24,10 @@ from config import (
 	DB_QUERY_GET_ALL,
 	DB_QUERY_GET_DISH_LIST,
 	DB_QUERY_INGREDIENTS_1,
-	DB_QUERY_INGREDIENTS_2
+	DB_QUERY_INGREDIENTS_2,
+	DB_QUERY_GET_RECIPES_BASED_ON_INGREDIENTS_1,
+	DB_QUERY_GET_RECIPES_BASED_ON_INGREDIENTS_2,
+	DB_QUERY_GET_RECIPES_BASED_ON_INGREDIENTS_3
 )
 hostname = socket.gethostname()
 isOnWalk = False
@@ -104,6 +107,29 @@ def getRecepies():
 
 	return json.dumps(list(data))
 
+@app.route('/Siri/RecipesBasedOnIngredients', methods=['GET'])
+def getRecepiesBasedOnIngredients():
+	try:
+		conn = mariadb.connect(
+			user=DB_USER,
+			password=DB_PASSWORD,
+			host=DB_HOST,
+			port=DB_PORT,
+			database=DB_DATABASE
+		)
+	except mariadb.Error as e:
+		print(f"Error connecting to MariaDB Platform: {e}")
+
+	# Get Cursor
+	cur = conn.cursor()
+
+	data = recipes_for_ingredinets(cur, [15])
+
+
+
+	print("DATA----", data)
+	return json.dumps(list(data))
+
 def instructions_for_book_recipes(cursor, selectedRecipes):
 	try:
 		selectedRecipesParsed = str(tuple(selectedRecipes))
@@ -126,6 +152,28 @@ def ingredients_for_recipe(cursor, selectedRecipes):
 		statement = DB_QUERY_INGREDIENTS_1 + " " + selectedRecipesParsed + " " + DB_QUERY_INGREDIENTS_2
 		ingredientList = []
 		cursor.execute(statement)
+
+		for (ingredients) in cursor:
+			ingredientList.append(ingredients)
+		return ingredientList
+	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
+
+def recipes_for_ingredinets(cursor, selectedIngredients):
+	try:
+		selectedIngredientsParsed = str(tuple(selectedIngredients))
+		print("SELECTED INGREDIENTS PARSED.----", selectedIngredientsParsed)
+		if len(selectedIngredients) == 1:
+			selectedIngredientsParsed = selectedIngredientsParsed.replace(',', "")
+		statement_1 = DB_QUERY_GET_RECIPES_BASED_ON_INGREDIENTS_1
+		statement_2 = DB_QUERY_GET_RECIPES_BASED_ON_INGREDIENTS_2
+		statement_3 = DB_QUERY_GET_RECIPES_BASED_ON_INGREDIENTS_3
+
+		totalStatement = statement_1 + selectedIngredientsParsed + statement_2 + selectedIngredientsParsed + statement_3
+
+		print("TOTAL STATEMENT-----", totalStatement)
+
+		ingredientList = []
+		cursor.execute(totalStatement)
 
 		for (ingredients) in cursor:
 			ingredientList.append(ingredients)
@@ -162,7 +210,6 @@ def get_all_recipes(cursor, query):
 
 @app.route('/Siri/ReactRecipes', methods=['POST'])
 def ReactRecepies():
-
 		request_data = request.json
 		recipes = request_data.get("idList")
 		keep = gkeepapi.Keep()
