@@ -46,7 +46,7 @@ var recipes = []Recipe{
 	{ID: "1", Recipe_name: "Pannkakor"},
 }
 
-// getAlbums responds with the list of all albums as JSON.
+// getRecipes responds with the list of all albums as JSON.
 func getRecipesTest(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, recipes)
 }
@@ -89,7 +89,7 @@ func GetConfig(params ...string) DbConf {
 func getRecipes() []string {
 	conf := GetConfig()
 	// Create the database handle, confirm driver is present
-	db, _ := sql.Open("mysql", conf.DB_USERNAME+":"+conf.DB_PASSWORD+"@tcp("+conf.DB_HOST+":"+conf.DB_PORT+")/"+conf.DB_NAME+"?parseTime=true")
+	db := connectDb()
 	defer db.Close()
 	s := make([]string, 3)
 
