@@ -5,3 +5,4 @@ __pycache__
 food.ini
 lastDate.ini
 walks.ini
+/go_rewrite/dev_config.json
