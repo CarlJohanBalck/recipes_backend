@@ -27,7 +27,8 @@ from config import (
 	DB_QUERY_INGREDIENTS_2,
 	DB_QUERY_GET_RECIPES_BASED_ON_INGREDIENTS_1,
 	DB_QUERY_GET_RECIPES_BASED_ON_INGREDIENTS_2,
-	DB_QUERY_GET_RECIPES_BASED_ON_INGREDIENTS_3
+	DB_QUERY_GET_RECIPES_BASED_ON_INGREDIENTS_3,
+	DB_QUERY_ADD_RECIPE
 )
 hostname = socket.gethostname()
 isOnWalk = False
@@ -126,8 +127,6 @@ def getRecepiesBasedOnIngredients():
 	data = recipes_for_ingredinets(cur, [15])
 
 
-
-	print("DATA----", data)
 	return json.dumps(list(data))
 
 def instructions_for_book_recipes(cursor, selectedRecipes):
@@ -156,6 +155,21 @@ def ingredients_for_recipe(cursor, selectedRecipes):
 		for (ingredients) in cursor:
 			ingredientList.append(ingredients)
 		return ingredientList
+	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
+
+def add_recipe(cursor, recipeInfo):
+	try:
+		recipeID = str(recipeInfo.get("recipe_id"))
+		recipeName = str(recipeInfo.get("recipe_name"))
+		recipeUrl = str(recipeInfo.get("recipe_url"))
+		recipeWeekend = str(recipeInfo.get("recipe_weekend"))
+		recipeImageUrl = str(recipeInfo.get("recipe_image_url"))
+		recipeInstructions = str(recipeInfo.get("recipe_instructions"))
+
+		query = (DB_QUERY_ADD_RECIPE)
+		values = (recipeID, recipeName, recipeUrl, recipeWeekend, recipeImageUrl, recipeInstructions)
+		cursor.execute(query, values)
+
 	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
 
 def recipes_for_ingredinets(cursor, selectedIngredients):
@@ -282,6 +296,36 @@ def ReactRecepies():
 		keep.sync()
 			
 		return json.dumps(list(grocery_list_tuple))
+
+
+@app.route('/Siri/AddRecipe', methods=['POST'])
+def addRecipe():
+
+	request_data = request.json
+
+	recipeInfo = request_data.get("recipeInfo")
+	print("RECIPES: ", recipeInfo)
+
+
+	try:
+		conn = mariadb.connect(
+			user=DB_USER,
+			password=DB_PASSWORD,
+			host=DB_HOST,
+			port=DB_PORT,
+			database=DB_DATABASE
+		)
+	except mariadb.Error as e:
+		print(f"Error connecting to MariaDB Platform: {e}")
+
+	# Get Cursor
+	cur = conn.cursor()
+
+	data = add_recipe(cur, recipeInfo)
+	conn.commit()
+
+	return json.dumps(data)
+	
 
 
 if __name__ == '__main__':
