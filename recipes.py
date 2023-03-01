@@ -22,13 +22,18 @@ from config import (
 	DB_PORT,
 	DB_DATABASE,
 	DB_QUERY_GET_ALL,
+	DB_QUERY_GET_ALL_INGREDIENTS,
+	DB_QUERY_GET_ALL_UNITS,
 	DB_QUERY_GET_DISH_LIST,
 	DB_QUERY_INGREDIENTS_1,
 	DB_QUERY_INGREDIENTS_2,
 	DB_QUERY_GET_RECIPES_BASED_ON_INGREDIENTS_1,
 	DB_QUERY_GET_RECIPES_BASED_ON_INGREDIENTS_2,
 	DB_QUERY_GET_RECIPES_BASED_ON_INGREDIENTS_3,
-	DB_QUERY_ADD_RECIPE
+	DB_QUERY_ADD_RECIPE,
+	DB_QUERY_ADD_INGREDIENT,
+	DB_QUERY_ADD_RECIPE_INSTRUCTIONS_NULL,
+	DB_QUERY_ADD_RECIPE_URL_NULL
 )
 hostname = socket.gethostname()
 isOnWalk = False
@@ -108,6 +113,45 @@ def getRecepies():
 
 	return json.dumps(list(data))
 
+@app.route('/Siri/Ingredients', methods=['GET'])
+def getIngredients():
+	try:
+		conn = mariadb.connect(
+			user=DB_USER,
+			password=DB_PASSWORD,
+			host=DB_HOST,
+			port=DB_PORT,
+			database=DB_DATABASE
+		)
+	except mariadb.Error as e:
+		print(f"Error connecting to MariaDB Platform: {e}")
+
+	# Get Cursor
+	cur = conn.cursor()
+	data = get_all_ingredients(cur, DB_QUERY_GET_ALL_INGREDIENTS)
+
+	return json.dumps(list(data))
+
+@app.route('/Siri/Units', methods=['GET'])
+def getUnits():
+	try:
+		conn = mariadb.connect(
+			user=DB_USER,
+			password=DB_PASSWORD,
+			host=DB_HOST,
+			port=DB_PORT,
+			database=DB_DATABASE
+		)
+	except mariadb.Error as e:
+		print(f"Error connecting to MariaDB Platform: {e}")
+
+	# Get Cursor
+	cur = conn.cursor()
+	data = get_all_ingredients(cur, DB_QUERY_GET_ALL_UNITS)
+
+	return json.dumps(list(data))
+
+
 @app.route('/Siri/RecipesBasedOnIngredients', methods=['GET'])
 def getRecepiesBasedOnIngredients():
 	try:
@@ -166,8 +210,35 @@ def add_recipe(cursor, recipeInfo):
 		recipeImageUrl = str(recipeInfo.get("recipe_image_url"))
 		recipeInstructions = str(recipeInfo.get("recipe_instructions"))
 
-		query = (DB_QUERY_ADD_RECIPE)
-		values = (recipeID, recipeName, recipeUrl, recipeWeekend, recipeImageUrl, recipeInstructions)
+		if recipeInstructions == "None":
+			values = (recipeID, recipeName, recipeUrl, recipeWeekend, recipeImageUrl)
+			query = (DB_QUERY_ADD_RECIPE_INSTRUCTIONS_NULL)
+			cursor.execute(query, values)
+		
+		elif recipeUrl == "None": 
+			query = (DB_QUERY_ADD_RECIPE_URL_NULL)
+			values = (recipeID, recipeName, recipeWeekend, recipeImageUrl, recipeInstructions)
+			cursor.execute(query, values)
+
+		else:
+			query = (DB_QUERY_ADD_RECIPE)
+			values = (recipeID, recipeName, recipeUrl, recipeWeekend, recipeImageUrl, recipeInstructions)
+			cursor.execute(query, values)
+
+	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
+
+
+def add_ingredient(cursor, ingredientInfo):
+	try:
+		recipe_ingredient_id = str(ingredientInfo.get("recipe_ingredient_id"))
+		recipe_id = str(ingredientInfo.get("recipe_id"))
+		amount = str(ingredientInfo.get("amount"))
+		unit = str(ingredientInfo.get("unit"))
+		ingredient = str(ingredientInfo.get("ingredient"))
+
+
+		query = (DB_QUERY_ADD_INGREDIENT)
+		values = (recipe_ingredient_id, recipe_id, amount, unit, ingredient)
 		cursor.execute(query, values)
 
 	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
@@ -217,6 +288,15 @@ def get_all_recipes(cursor, query):
 
 			recipeList.append(recipe)
 		return recipeList
+	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
+
+def get_all_ingredients(cursor, query):
+	try:
+		ingredientsList = []
+		cursor.execute(query)
+		for (ingredient) in cursor:
+			ingredientsList.append(ingredient)
+		return ingredientsList
 	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
 
 
@@ -322,6 +402,34 @@ def addRecipe():
 	cur = conn.cursor()
 
 	data = add_recipe(cur, recipeInfo)
+	conn.commit()
+
+	return json.dumps(data)
+
+@app.route('/Siri/AddIngredient', methods=['POST'])
+def addIngredient():
+
+	request_data = request.json
+
+	ingredientInfo = request_data.get("ingredientInfo")
+	print("INGREDIENTS: ", ingredientInfo)
+
+
+	try:
+		conn = mariadb.connect(
+			user=DB_USER,
+			password=DB_PASSWORD,
+			host=DB_HOST,
+			port=DB_PORT,
+			database=DB_DATABASE
+		)
+	except mariadb.Error as e:
+		print(f"Error connecting to MariaDB Platform: {e}")
+
+	# Get Cursor
+	cur = conn.cursor()
+
+	data = add_ingredient(cur, ingredientInfo)
 	conn.commit()
 
 	return json.dumps(data)
