@@ -24,6 +24,7 @@ from config import (
 	DB_QUERY_GET_ALL,
 	DB_QUERY_GET_ALL_INGREDIENTS,
 	DB_QUERY_GET_ALL_UNITS,
+	DB_QUERY_GET_ALL_RECIPE_INGREDIENTS,
 	DB_QUERY_GET_DISH_LIST,
 	DB_QUERY_INGREDIENTS_1,
 	DB_QUERY_INGREDIENTS_2,
@@ -151,6 +152,25 @@ def getUnits():
 
 	return json.dumps(list(data))
 
+@app.route('/Siri/RecipeIngredients', methods=['GET'])
+def getRecipeIngredients():
+	try:
+		conn = mariadb.connect(
+			user=DB_USER,
+			password=DB_PASSWORD,
+			host=DB_HOST,
+			port=DB_PORT,
+			database=DB_DATABASE
+		)
+	except mariadb.Error as e:
+		print(f"Error connecting to MariaDB Platform: {e}")
+
+	# Get Cursor
+	cur = conn.cursor()
+	data = get_recipe_ingredients(cur, DB_QUERY_GET_ALL_RECIPE_INGREDIENTS)
+
+	return json.dumps(list(data))
+
 
 @app.route('/Siri/RecipesBasedOnIngredients', methods=['GET'])
 def getRecepiesBasedOnIngredients():
@@ -238,7 +258,7 @@ def add_ingredient(cursor, ingredientInfo):
 
 
 		query = (DB_QUERY_ADD_INGREDIENT)
-		values = (recipe_ingredient_id, recipe_id, amount, unit, ingredient)
+		values = (recipe_ingredient_id, recipe_id, ingredient, unit, amount)
 		cursor.execute(query, values)
 
 	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
@@ -246,7 +266,6 @@ def add_ingredient(cursor, ingredientInfo):
 def recipes_for_ingredinets(cursor, selectedIngredients):
 	try:
 		selectedIngredientsParsed = str(tuple(selectedIngredients))
-		print("SELECTED INGREDIENTS PARSED.----", selectedIngredientsParsed)
 		if len(selectedIngredients) == 1:
 			selectedIngredientsParsed = selectedIngredientsParsed.replace(',', "")
 		statement_1 = DB_QUERY_GET_RECIPES_BASED_ON_INGREDIENTS_1
@@ -298,6 +317,16 @@ def get_all_ingredients(cursor, query):
 			ingredientsList.append(ingredient)
 		return ingredientsList
 	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
+
+def get_recipe_ingredients(cursor, query):
+	try:
+		recipe_ingredients_list = []
+		cursor.execute(query)
+		for (ingredient) in cursor:
+			recipe_ingredients_list.append(ingredient)
+		return recipe_ingredients_list
+	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
+
 
 
 
