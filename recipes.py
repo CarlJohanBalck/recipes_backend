@@ -34,7 +34,9 @@ from config import (
 	DB_QUERY_ADD_RECIPE,
 	DB_QUERY_ADD_INGREDIENT,
 	DB_QUERY_ADD_RECIPE_INSTRUCTIONS_NULL,
-	DB_QUERY_ADD_RECIPE_URL_NULL
+	DB_QUERY_ADD_RECIPE_URL_NULL,
+	DB_QUERY_MAX_ID_RECIPE,
+	DB_QUERY_MAX_ID_RECIPE_INGREDIENT
 )
 hostname = socket.gethostname()
 isOnWalk = False
@@ -223,7 +225,10 @@ def ingredients_for_recipe(cursor, selectedRecipes):
 
 def add_recipe(cursor, recipeInfo):
 	try:
-		recipeID = str(recipeInfo.get("recipe_id"))
+		cursor.execute(DB_QUERY_MAX_ID_RECIPE)
+
+		for (id) in cursor:
+			recipeID = id[0] + 1
 		recipeName = str(recipeInfo.get("recipe_name"))
 		recipeUrl = str(recipeInfo.get("recipe_url"))
 		recipeWeekend = str(recipeInfo.get("recipe_weekend"))
@@ -253,8 +258,20 @@ def add_recipe(cursor, recipeInfo):
 
 def add_ingredient(cursor, ingredientInfo):
 	try:
-		recipe_ingredient_id = str(ingredientInfo.get("recipe_ingredient_id"))
-		recipe_id = str(ingredientInfo.get("recipe_id"))
+
+		cursor.execute(DB_QUERY_MAX_ID_RECIPE_INGREDIENT)
+
+		for (id) in cursor:
+			recipe_ingredient_id = id[0] + 1
+		
+		cursor.execute(DB_QUERY_MAX_ID_RECIPE)
+
+		for (id) in cursor:
+			recipe_id = id[0]
+		
+		# recipe_id = str(ingredientInfo.get("recipe_id"))
+		print("RECIPE ID: ", recipe_id)
+		print("RECIPE INGREDIENT ID: ", recipe_ingredient_id)
 		amount = str(ingredientInfo.get("amount"))
 		unit = str(ingredientInfo.get("unit"))
 		ingredient = str(ingredientInfo.get("ingredient"))
