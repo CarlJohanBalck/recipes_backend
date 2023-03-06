@@ -234,18 +234,21 @@ def add_recipe(cursor, recipeInfo):
 			values = (recipeID, recipeName, recipeUrl, recipeWeekend, recipeImageUrl)
 			query = (DB_QUERY_ADD_RECIPE_INSTRUCTIONS_NULL)
 			cursor.execute(query, values)
+			return "200"
 		
 		elif recipeUrl == "None": 
 			query = (DB_QUERY_ADD_RECIPE_URL_NULL)
 			values = (recipeID, recipeName, recipeWeekend, recipeImageUrl, recipeInstructions)
 			cursor.execute(query, values)
+			return "200"
 
 		else:
 			query = (DB_QUERY_ADD_RECIPE)
 			values = (recipeID, recipeName, recipeUrl, recipeWeekend, recipeImageUrl, recipeInstructions)
 			cursor.execute(query, values)
+			return "200"
 
-	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
+	except mariadb.Error as e: return "Error retrieving entry from database: " + str(e)
 
 
 def add_ingredient(cursor, ingredientInfo):
@@ -260,8 +263,9 @@ def add_ingredient(cursor, ingredientInfo):
 		query = (DB_QUERY_ADD_INGREDIENT)
 		values = (recipe_ingredient_id, recipe_id, ingredient, unit, amount)
 		cursor.execute(query, values)
+		return "200"
 
-	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
+	except mariadb.Error as e: return "Error retrieving entry from database: " + str(e)
 
 def recipes_for_ingredinets(cursor, selectedIngredients):
 	try:
