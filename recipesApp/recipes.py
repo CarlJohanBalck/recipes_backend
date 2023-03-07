@@ -1,14 +1,11 @@
-from datetime import datetime, date, timedelta
-from tkinter import INSERT
+from datetime import datetime
 from flask import Flask, request
 from flask_cors import CORS
 import socket
-import random
 import gkeepapi
 import json
 import mysql.connector as mariadb;
 from decimal import *
-import re
 
 
 from config import (
@@ -50,50 +47,6 @@ CORS(app)
 print('\n Hostname of your Pi: ' + hostname)
 print(' IP address of Pi: ' + ip_address)
 
-@app.route('/Siri/MatlistaTest', methods=['POST'])
-def MatlistaTest():
-		data = request.json
-		numberOfDishes = data.get("numberOfDishes")
-		keep = gkeepapi.Keep()
-		keep.login(KEEP_EMAIL, KEEP_PASSWORD)
-		
-		try:
-			conn = mariadb.connect(
-				user=DB_USER,
-				password=DB_PASSWORD,
-				host=DB_HOST,
-				port=DB_PORT,
-				database=DB_DATABASE
-		)
-		except mariadb.Error as e:
-			print(f"Error connecting to MariaDB Platform: {e}")
-			sys.exit(1)
-		
-		# # Get Cursor
-		cur = conn.cursor()
-		newGroceryList = []
-
-		allRecipes = get_all_recipes(cur, DB_QUERY_GET_ALL)
-		
-		n = 0
-
-		r = range(n+1, len(allRecipes))
-
-		data = random.sample(r, numberOfDishes)
-
-		newDishList = []
-		
-		ingredients = ingredients_for_recipe(cur, data)
-		for i in range (len(ingredients)):
-			groceryRow = str(ingredients[i][0]) + " " + str(ingredients[i][1]).replace('None', '') + " " + str(ingredients[i][2])
-			newGroceryList.append(groceryRow)
-	
-		newDishList = dishListForSelectedRecipes(cur, data)
-
-
-		
-		return json.dumps(list(newDishList))
-
 @app.route('/Siri/Recipes', methods=['GET'])
 def getRecepies():
 	try:
@@ -110,10 +63,6 @@ def getRecepies():
 	# Get Cursor
 	cur = conn.cursor()
 	data = get_all_recipes(cur, DB_QUERY_GET_ALL)
-
-
-
-
 	return json.dumps(list(data))
 
 @app.route('/Siri/Ingredients', methods=['GET'])

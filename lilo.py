@@ -6,12 +6,9 @@ from flask import Flask, request
 from flask_cors import CORS
 import socket
 import time
-from timer import Timer
 import configparser
 import calendar
 from sense_hat import SenseHat
-from icalendar import Calendar, Event, vCalAddress, vText
-from pathlib import Path
 import os
 import mysql.connector as mariadb;
 from decimal import *
@@ -147,83 +144,9 @@ print(' IP address of Pi: ' + ip_address)
 
 sense = SenseHat()
 
-@app.route('/Siri/Senast', methods=['GET'])
-def LiloSenast():
-	config = configparser.ConfigParser()
-	now = datetime.now() # current date and time	
-	date_time = now.strftime("%d/%m/%Y")	
-
-	my_date = date.today()
-	weekday = calendar.day_name[my_date.weekday()]
-
-	config.read('lastDate.ini')
-	if(config['DEFAULT']['LAST_DATE'] == '""' or not config['DEFAULT']['LAST_DATE']):
-		return "Hittade inget senast datum"
-
-	return "Lilo fick kortison senast" + " " + config['DEFAULT']['LAST_DATE']
-
 
 def indices(lst, item):
 	return [i for i, x in enumerate(lst) if x == item]
-
-
-
-	
-# @app.route('/Siri/AntalPromenader', methods=['GET'])
-# def LiloAntalPromendater():
-# 	config = configparser.ConfigParser()
-
-# 	config.read('walks.ini')
-
-# 	nbrWalks = config['DEFAULT']['NBR_WALKS']
-# 	totalTime = config['DEFAULT']['TOTAL_TIME']
-
-# 	return "Lilo har gått " + " " + nbrWalks + " promenader " + "sedan 7e mars 2022. Hon har även varit ute i " + totalTime + " sekunder"
- 
-
-# def StartTimer(config):
-# 	t = Timer()
-# 	t.start()
-	
-# 	while isOnWalk == True:
-# 		time.sleep(1)
-# 		print("TIMER COUNTING....")
-# 	else: 
-# 		print("TIMER STOPPED....")
-# 		resultTime = t.stop()	
-# 		retultTimeInt = int(resultTime)
-# 		timeOutAlready = int(config['DEFAULT']['TOTAL_TIME'])
-# 		totalTime = timeOutAlready + retultTimeInt
-# 		config['DEFAULT']['CURRENT_WALK_TIME'] = str(retultTimeInt)
-# 		config['DEFAULT']['TOTAL_TIME'] = str(totalTime)
-# 		with open('walks.ini', 'w') as configfile:
-# 			config.write(configfile)
-
-@app.route('/Siri/Promenad', methods=['POST'])
-def LiloPromenad():
-	wentout = request.form['wentout']
-	camehome = request.form['camehome']	
-	config = configparser.ConfigParser()
-	
-	if wentout == "true":
-		config.read('walks.ini')
-		global isOnWalk
-		isOnWalk = True
-		nbr_walks = config.get("DEFAULT", "nbr_walks")
-		newNumberWalks = int(nbr_walks) + 1
-		config['DEFAULT']['NBR_WALKS'] = str(newNumberWalks)
-		
-		with open('walks.ini', 'w') as configfile:
-			config.write(configfile)
-		return StartTimer(config)
-		
-	if camehome == "true":
-		isOnWalk = False
-		time.sleep(3)
-		config.read('walks.ini')
-		current_walk_time = int(config.get("DEFAULT", "current_walk_time"))
-		conversion = str(timedelta(seconds=current_walk_time))
-		return "Totalt tid ute denna promenad med Lilo var: " + conversion
 
 def get_data(cursor, recepies):
 	try:
@@ -247,19 +170,6 @@ def get_data(cursor, recepies):
 
 
 
-
-# @app.route('/Siri/PromenadSummary', methods=['GET'])
-# def PromenadSummary():
-# 	config = configparser.ConfigParser()
-# 	config.read('walks.ini')
-# 	current_walk_time = int(config.get("DEFAULT", "current_walk_time"))
-# 	nbr_walks = int(config.get("DEFAULT", "nbr_walks"))
-# 	total_time = int(config.get("DEFAULT", "total_time"))
-
-# 	conversion_current_walk_time = str(timedelta(seconds=current_walk_time))
-
-# 	conversion_total_time = str(timedelta(seconds=total_time))
-# 	return "Senaste tid ute med lilo var " + conversion_current_walk_time + "...Totalt antal promenader är " + str(nbr_walks) + " stycken." + "...Total tid ute med lilo är " + conversion_total_time
 
 def first2(s):
 	return s[:2]
@@ -302,8 +212,7 @@ def LiloStatusSpeech():
 		veckodag = "Fredag"
 	if(weekday == "Saturday"):
 		veckodag = "Lördag"
-	# testVar = json.loads(config.get("DEFAULT","futureMedicationDates"))
-	# print("test var", testVar)
+
 	match = veckodag + " " + date_time
 	if (match == config['DEFAULT']['LAST_DATE'] and date_time in futureMedicationDates):
 		return "Idag ska Lilo få medicin, men jag har redan skrivit upp att hon fått medicin idag " + config['DEFAULT']['LAST_DATE']
