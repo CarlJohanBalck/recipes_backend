@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  backend:
+    build: .
+    ports:
+      - "5005:5005"
+    depends_on:
+      - db
+  db:
+    image: carl0222/recipes_database:09_Mar_2023_0718
+    ports:
+      - "3306:3306"
+    restart: always
+      
+    volumes:
+      - db-data:/var/lib/mysql
+  
+  frontend:
+    image: carl0222/recipes
+    ports:
+      - "8080:80"
+    restart: always
+  
+
+volumes:
+  db-data:

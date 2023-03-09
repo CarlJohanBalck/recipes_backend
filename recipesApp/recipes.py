@@ -44,11 +44,12 @@ ip_address = IP_ADDRESS
 app = Flask(__name__)
 CORS(app)
 
-print('\n Hostname of your Pi: ' + hostname)
+print('\n Hostname of your Pizzzz: ' + hostname)
 print(' IP address of Pi: ' + ip_address)
 
 @app.route('/Siri/Recipes', methods=['GET'])
 def getRecepies():
+	
 	try:
 		conn = mariadb.connect(
 			user=DB_USER,
@@ -61,6 +62,7 @@ def getRecepies():
 		print(f"Error connecting to MariaDB Platform: {e}")
 
 	# Get Cursor
+	print("WOWOWO-----", DB_HOST)
 	cur = conn.cursor()
 	data = get_all_recipes(cur, DB_QUERY_GET_ALL)
 	return json.dumps(list(data))
@@ -436,5 +438,4 @@ def addIngredient():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host=ip_address, port=RECIPES_PORT, use_reloader=True)
-	
+    app.run(debug=True, host="0.0.0.0", port=RECIPES_PORT, use_reloader=True)
