@@ -50,11 +50,12 @@ print(' IP address of Pi: ' + ip_address)
 @app.route('/Siri/Recipes', methods=['GET'])
 def getRecepies():
 	
+	
 	try:
 		conn = mariadb.connect(
 			user=DB_USER,
 			password=DB_PASSWORD,
-			host=DB_HOST,
+			host="db",
 			port=DB_PORT,
 			database=DB_DATABASE
 		)
@@ -68,6 +69,7 @@ def getRecepies():
 
 @app.route('/Siri/Ingredients', methods=['GET'])
 def getIngredients():
+	
 	try:
 		conn = mariadb.connect(
 			user=DB_USER,
@@ -412,9 +414,6 @@ def addIngredient():
 	request_data = request.json
 
 	ingredientInfo = request_data.get("ingredientInfo")
-	print("INGREDIENTS: ", ingredientInfo)
-
-
 	try:
 		conn = mariadb.connect(
 			user=DB_USER,
@@ -425,7 +424,7 @@ def addIngredient():
 		)
 	except mariadb.Error as e:
 		print(f"Error connecting to MariaDB Platform: {e}")
-
+	
 	# Get Cursor
 	cur = conn.cursor()
 
@@ -437,4 +436,4 @@ def addIngredient():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host=ip_address, port=RECIPES_PORT, use_reloader=True)
+    app.run(debug=True, host="0.0.0.0", port=RECIPES_PORT, use_reloader=True)

@@ -2,12 +2,14 @@ version: '3'
 
 services:
   backend:
+    container_name: backend
     build: .
     ports:
       - "5005:5005"
     depends_on:
       - db
   db:
+    container_name: db
     image: carl0222/recipes_database:09_Mar_2023_0718
     ports:
       - "3306:3306"
@@ -17,6 +19,7 @@ services:
       - db-data:/var/lib/mysql
   
   frontend:
+    container_name: frontend
     image: carl0222/recipes
     ports:
       - "8080:80"
