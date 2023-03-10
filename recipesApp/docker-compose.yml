@@ -10,7 +10,7 @@ services:
       - db
   db:
     container_name: db
-    image: carl0222/recipes_database:09_Mar_2023_0718
+    image: carl0222/recipes_database:latest
     ports:
       - "3306:3306"
     restart: always

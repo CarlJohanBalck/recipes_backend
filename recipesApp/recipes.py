@@ -55,7 +55,7 @@ def getRecepies():
 		conn = mariadb.connect(
 			user=DB_USER,
 			password=DB_PASSWORD,
-			host="db",
+			host=DB_HOST,
 			port=DB_PORT,
 			database=DB_DATABASE
 		)
