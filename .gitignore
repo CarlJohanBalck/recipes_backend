@@ -6,3 +6,4 @@ food.ini
 lastDate.ini
 walks.ini
 /go_rewrite/dev_config.json
+/recipesApp/push_dockerhub.sh
