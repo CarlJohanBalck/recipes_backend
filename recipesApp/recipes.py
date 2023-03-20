@@ -338,6 +338,37 @@ def ReactNativeIngredients():
 		# newGroceryList.append(newDishList)
 		return json.dumps(list(newGroceryList))
 
+@app.route('/Siri/ReactNativeInstructions', methods=['POST'])
+def ReactNativeInstructions():
+		request_data = request.json
+		recipes = request_data.get("idList")
+
+		try:
+			conn = mariadb.connect(
+				user=DB_USER,
+				password=DB_PASSWORD,
+				host=DB_HOST,
+				port=DB_PORT,
+				database=DB_DATABASE
+		)
+		except mariadb.Error as e:
+			print(f"Error connecting to MariaDB Platform: {e}")
+			sys.exit(1)
+		
+		# # Get Cursor
+		cur = conn.cursor()
+	
+		instructionsList = []
+		
+	
+
+		instructions = instructions_for_book_recipes(cur, recipes)
+
+		# dishes = dishListForSelectedRecipes(cur, recipes)
+
+	
+		return json.dumps(list(instructions))
+
 
 @app.route('/Siri/ReactNativeRecipes', methods=['POST'])
 def ReactNativeRecipes():
