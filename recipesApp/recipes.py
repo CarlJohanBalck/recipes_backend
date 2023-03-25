@@ -33,7 +33,8 @@ from config import (
 	DB_QUERY_ADD_RECIPE_INSTRUCTIONS_NULL,
 	DB_QUERY_ADD_RECIPE_URL_NULL,
 	DB_QUERY_MAX_ID_RECIPE,
-	DB_QUERY_MAX_ID_RECIPE_INGREDIENT
+	DB_QUERY_MAX_ID_RECIPE_INGREDIENT,
+	DB_QUERY_GET_INGREDIENT_ID
 )
 hostname = socket.gethostname()
 isOnWalk = False
@@ -159,6 +160,28 @@ def instructions_for_book_recipes(cursor, selectedRecipes):
 		for (instruction) in cursor:
 			instructionList.append(instruction)
 		return instructionList
+	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
+
+def add_to_pentry(cursor, ingredient_id):
+	try:
+		statement = "INSERT INTO pentry (ingredient_id) VALUES " + "(" + str(ingredient_id) + ")"  
+		cursor.execute(statement)
+		return "200"
+	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
+
+def remove_from_pentry(cursor, ingredient_id):
+	try:
+		statement = "DELETE FROM pentry WHERE ingredient_id=" + str(ingredient_id)  
+		cursor.execute(statement)
+		return "200"
+	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
+
+def get_ingredient_id(cursor, scan_id):
+	try:
+		statement = DB_QUERY_GET_INGREDIENT_ID + scan_id
+		cursor.execute(statement)
+
+		return cursor.fetchone()[0]
 	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
 
 def ingredients_for_recipe(cursor, selectedRecipes):
@@ -368,6 +391,39 @@ def ReactNativeInstructions():
 
 	
 		return json.dumps(list(instructions))
+
+@app.route('/Siri/ReactNativeAddPentry', methods=['POST'])
+def ReactNativeAddPentry():
+		request_data = request.json
+		scan_id = request_data.get("data")
+		removeItem = request_data.get("removeItem")
+
+		try:
+			conn = mariadb.connect(
+				user=DB_USER,
+				password=DB_PASSWORD,
+				host=DB_HOST,
+				port=DB_PORT,
+				database=DB_DATABASE
+		)
+		except mariadb.Error as e:
+			print(f"Error connecting to MariaDB Platform: {e}")
+			sys.exit(1)
+		
+		# # Get Cursor
+		cur = conn.cursor()
+
+		ingredient_id = get_ingredient_id(cur, scan_id)
+
+		if removeItem: 
+			data = remove_from_pentry(cur, ingredient_id)
+		else: 
+			data = add_to_pentry(cur, ingredient_id)
+		
+		# data = add_to_pentry(cur, ingredient_id)
+		conn.commit()
+	
+		return json.dumps(data)
 
 
 @app.route('/Siri/ReactNativeRecipes', methods=['POST'])
