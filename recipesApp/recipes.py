@@ -169,6 +169,15 @@ def add_to_pentry(cursor, ingredient_id):
 		return "200"
 	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
 
+
+def add_to_pentry_manual(cursor, ingredients):
+	try:
+		parsedIngredients = str(tuple(ingredients))
+		statement = "INSERT INTO pentry (ingredient_id) Select " + str(ingredient_id) + " Where not exists(select * from pentry where ingredient_id= " + str(ingredient_id) + ")"
+		cursor.execute(statement)
+		return "200"
+	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
+
 def remove_from_pentry(cursor, ingredient_id):
 	try:
 		statement = "DELETE FROM pentry WHERE ingredient_id=" + str(ingredient_id)  
@@ -424,6 +433,35 @@ def ReactNativeAddPentry():
 		conn.commit()
 	
 		return json.dumps(data)
+
+
+@app.route('/Siri/ReactNativeAddPentryManual', methods=['POST'])
+def ReactNativeAddPentryManual():
+		request_data = request.json
+		ingredient = request_data.get("ingredient")
+		removal = request_data.get("remove")
+
+		try:
+			conn = mariadb.connect(
+				user=DB_USER,
+				password=DB_PASSWORD,
+				host=DB_HOST,
+				port=DB_PORT,
+				database=DB_DATABASE
+		)
+		except mariadb.Error as e:
+			print(f"Error connecting to MariaDB Platform: {e}")
+			sys.exit(1)
+
+		cur = conn.cursor()
+
+		if removal:
+			ingredient_id = remove_from_pentry(cur, ingredient)
+		else: 
+			ingredient_id = add_to_pentry(cur, ingredient)
+		conn.commit()
+		return json.dumps(ingredient_id)
+
 
 
 @app.route('/Siri/ReactNativeRecipes', methods=['POST'])
