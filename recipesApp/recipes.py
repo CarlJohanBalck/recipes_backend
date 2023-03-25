@@ -164,7 +164,7 @@ def instructions_for_book_recipes(cursor, selectedRecipes):
 
 def add_to_pentry(cursor, ingredient_id):
 	try:
-		statement = "INSERT INTO pentry (ingredient_id) VALUES " + "(" + str(ingredient_id) + ")"  
+		statement = "INSERT INTO pentry (ingredient_id) Select " + str(ingredient_id) + " Where not exists(select * from pentry where ingredient_id= " + str(ingredient_id) + ")"
 		cursor.execute(statement)
 		return "200"
 	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
