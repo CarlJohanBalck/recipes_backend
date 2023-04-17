@@ -34,7 +34,11 @@ from config import (
 	DB_QUERY_ADD_RECIPE_URL_NULL,
 	DB_QUERY_MAX_ID_RECIPE,
 	DB_QUERY_MAX_ID_RECIPE_INGREDIENT,
-	DB_QUERY_GET_INGREDIENT_ID
+	DB_QUERY_GET_INGREDIENT_ID,
+	DB_QUERY_GET_PENTRY,
+	DB_QUERY_GET_NEAR_READY_RECIPES,
+	DB_QUERY_GET_DISH_LIST_REACT_NATIVE,
+	DB_QUERY_GET_PENTRY_TO_ADD
 )
 hostname = socket.gethostname()
 isOnWalk = False
@@ -68,6 +72,42 @@ def getRecepies():
 	data = get_all_recipes(cur, DB_QUERY_GET_ALL)
 	return json.dumps(list(data))
 
+@app.route('/Siri/ReactNativeGetPentry', methods=['GET'])
+def getPentry():
+	try:
+		conn = mariadb.connect(
+			user=DB_USER,
+			password=DB_PASSWORD,
+			host=DB_HOST,
+			port=DB_PORT,
+			database=DB_DATABASE
+		)
+	except mariadb.Error as e:
+		print(f"Error connecting to MariaDB Platform: {e}")
+
+	# Get Cursor
+	cur = conn.cursor()
+	data = get_pentry(cur, DB_QUERY_GET_PENTRY)
+	return json.dumps(list(data))
+
+@app.route('/Siri/ReactNativeGetNearReadyRecipes', methods=['GET'])
+def getNearReadyRecipes():
+	try:
+		conn = mariadb.connect(
+			user=DB_USER,
+			password=DB_PASSWORD,
+			host=DB_HOST,
+			port=DB_PORT,
+			database=DB_DATABASE
+		)
+	except mariadb.Error as e:
+		print(f"Error connecting to MariaDB Platform: {e}")
+
+	# Get Cursor
+	cur = conn.cursor()
+	data = get_near_ready_recipes(cur, DB_QUERY_GET_NEAR_READY_RECIPES)
+	return json.dumps(list(data))
+
 @app.route('/Siri/Ingredients', methods=['GET'])
 def getIngredients():
 	
@@ -85,6 +125,26 @@ def getIngredients():
 	# Get Cursor
 	cur = conn.cursor()
 	data = get_all_ingredients(cur, DB_QUERY_GET_ALL_INGREDIENTS)
+
+	return json.dumps(list(data))
+
+@app.route('/Siri/IngredientsToAdd', methods=['GET'])
+def getIngredientsToAdd():
+	
+	try:
+		conn = mariadb.connect(
+			user=DB_USER,
+			password=DB_PASSWORD,
+			host=DB_HOST,
+			port=DB_PORT,
+			database=DB_DATABASE
+		)
+	except mariadb.Error as e:
+		print(f"Error connecting to MariaDB Platform: {e}")
+
+	# Get Cursor
+	cur = conn.cursor()
+	data = get_all_ingredients(cur, DB_QUERY_GET_PENTRY_TO_ADD)
 
 	return json.dumps(list(data))
 
@@ -303,8 +363,42 @@ def dishListForSelectedRecipes(cursor, selectedRecipes):
 		return dishList
 	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
 
+def dishListForSelectedRecipesReactNative(cursor, selectedRecipes):
+	try:
+		selectedRecipesParsed = str(tuple(selectedRecipes))
+		if len(selectedRecipes) == 1:
+			selectedRecipesParsed = selectedRecipesParsed.replace(',', "")
+		statement = DB_QUERY_GET_DISH_LIST_REACT_NATIVE + " " + selectedRecipesParsed;
+		dishList = []
+		cursor.execute(statement)
+
+		for (dish) in cursor:
+			dishList.append(dish)
+		return dishList
+	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
+
 
 def get_all_recipes(cursor, query):
+	try:
+		recipeList = []
+		cursor.execute(query)
+		for (recipe) in cursor:
+
+			recipeList.append(recipe)
+		return recipeList
+	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
+
+def get_pentry(cursor, query):
+	try:
+		pentryList = []
+		cursor.execute(query)
+		for (pentryId) in cursor:
+
+			pentryList.append(pentryId)
+		return pentryList
+	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
+
+def get_near_ready_recipes(cursor, query):
 	try:
 		recipeList = []
 		cursor.execute(query)
@@ -360,14 +454,6 @@ def ReactNativeIngredients():
 			groceryRow = str(ingredients[i][0]) + " " + str(ingredients[i][1]).replace('None', '') + " " + str(ingredients[i][2])
 			newGroceryList.append(groceryRow)
 
-		# instructions = instructions_for_book_recipes(cur, recipes)
-
-		# dishes = dishListForSelectedRecipes(cur, recipes)
-
-		# for i in range (len(dishes)):
-		# 	dishRow = str(dishes[i][0]) + " " + str(dishes[i][1]).replace('None', '')
-		# 	newDishList.append(dishRow)
-		# newGroceryList.append(newDishList)
 		return json.dumps(list(newGroceryList))
 
 @app.route('/Siri/ReactNativeInstructions', methods=['POST'])
@@ -395,9 +481,6 @@ def ReactNativeInstructions():
 	
 
 		instructions = instructions_for_book_recipes(cur, recipes)
-
-		# dishes = dishListForSelectedRecipes(cur, recipes)
-
 	
 		return json.dumps(list(instructions))
 
@@ -486,13 +569,11 @@ def ReactNativeRecipes():
 		
 		newDishList = []
 		
-		instructions = instructions_for_book_recipes(cur, recipes)
-
-		dishes = dishListForSelectedRecipes(cur, recipes)
+		dishes = dishListForSelectedRecipesReactNative(cur, recipes)
 
 		for i in range (len(dishes)):
-			dishRow = str(dishes[i][0]) + " " + str(dishes[i][1]).replace('None', '')
-			newDishList.append(dishRow)
+			# dishRow = str(dishes[i][0]) + " " + str(dishes[i][1]).replace('None', '')
+			newDishList.append(dishes[i])
 		return json.dumps(list(newDishList))
 
 @app.route('/Siri/ReactRecipes', methods=['POST'])
