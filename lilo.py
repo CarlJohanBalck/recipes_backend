@@ -166,11 +166,6 @@ def get_data(cursor, recepies):
 	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
 
 
-
-
-
-
-
 def first2(s):
 	return s[:2]
 

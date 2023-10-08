@@ -1,5 +1,4 @@
 version: '3'
-
 services:
   backend:
     container_name: backend
@@ -9,15 +8,19 @@ services:
       - "5002:5002"
     depends_on:
       - db
+    networks: 
+    - recipe_app
   db:
     container_name: db
     image: carl0222/recipes_database:latest
     ports:
-      - "3306:3306"
+      - "3307:3307"
     restart: always
       
     volumes:
       - db-data:/var/lib/mysql
+    networks: 
+    - recipe_app
   
   frontend:
     container_name: frontend
@@ -25,6 +28,17 @@ services:
     ports:
       - "8080:80"
     restart: always
+<<<<<<< HEAD
 
+=======
+    networks: 
+      - recipe_app
+>>>>>>> 0a7c75e (commit for pi5)
 volumes:
   db-data:
+
+networks:
+  recipe_app:
+    # Use a custom driver
+    driver: bridge
+

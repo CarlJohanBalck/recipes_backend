@@ -1,11 +1,11 @@
 IP_ADDRESS = "192.168.0.4"
 PORT = 5001
-RECIPES_PORT = 5005
-KEEP_EMAIL = "carljohanbalck@gmail.com"
-KEEP_PASSWORD = "xxx"
+RECIPES_PORT = 5002
+KEEP_EMAIL = "email@email.com"
+KEEP_PASSWORD = "password"
 DB_USER = "root"
 DB_PASSWORD = "root"
-DB_HOST = "localhost"
+DB_HOST = "0.0.0.0"
 DB_PORT = 3306
 DB_DATABASE = "cool_db"
 DB_QUERY_GET_ALL = "SELECT * FROM recipes_view"
@@ -22,4 +22,5 @@ DB_QUERY_ADD_RECIPE = "INSERT INTO recipe (id, name, url, helg, image_url, instr
 DB_QUERY_ADD_INGREDIENT = "INSERT INTO recipe_ingredient (id, recipe_id, ingredient_id, unit_id, amount, price) VALUES(%s,%s,%s,%s,%s,0)"
 DB_QUERY_ADD_RECIPE_INSTRUCTIONS_NULL = "INSERT INTO recipe (id, name, url, helg, image_url, instructions) VALUES(%s,%s,%s,%s,%s,NULL)"
 DB_QUERY_ADD_RECIPE_URL_NULL = "INSERT INTO recipe (id, name, url, helg, image_url, instructions) VALUES(%s,%s,NULL,%s,%s,%s)"
-
+DB_QUERY_MAX_ID_RECIPE="select MAX(id) from recipe"
+DB_QUERY_MAX_ID_RECIPE_INGREDIENT="select MAX(id) from recipe_ingredient"
