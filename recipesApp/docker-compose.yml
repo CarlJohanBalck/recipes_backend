@@ -2,19 +2,16 @@ version: '3'
 services:
   backend:
     container_name: backend
-    build: .
-    # image: carl0222/recipes_backend:latest
+    image: carl0222/recipes_backend_amd64:latest
     ports:
       - "5002:5002"
-    depends_on:
-      - db
     networks: 
     - recipe_app
   db:
     container_name: db
-    image: carl0222/recipes_database:latest
+    image: carl0222/recipes_database_amd64:latest
     ports:
-      - "3307:3307"
+      - "3306:3306"
     restart: always
       
     volumes:
@@ -24,21 +21,16 @@ services:
   
   frontend:
     container_name: frontend
-    image: carl0222/recipes
+    image: carl0222/recipes_frontend_amd64
     ports:
       - "8080:80"
     restart: always
-<<<<<<< HEAD
-
-=======
     networks: 
       - recipe_app
->>>>>>> 0a7c75e (commit for pi5)
 volumes:
   db-data:
 
 networks:
   recipe_app:
-    # Use a custom driver
-    driver: bridge
+ 
 

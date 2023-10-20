@@ -52,7 +52,6 @@ print('\n Hostname: ' + hostname)
 @app.route('/Siri/Recipes', methods=['GET'])
 def getRecepies():
 	
-	
 	try:
 		conn = mariadb.connect(
 			user=DB_USER,
