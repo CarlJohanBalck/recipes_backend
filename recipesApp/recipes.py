@@ -9,8 +9,7 @@ from decimal import *
 
 
 from config import (
-	IP_ADDRESS,
-	RECIPES_PORT,
+	PORT,
 	KEEP_EMAIL,
 	KEEP_PASSWORD,
 	DB_USER,
@@ -45,12 +44,10 @@ isOnWalk = False
 
 hasBeenGiven = False
 
-ip_address = IP_ADDRESS
 app = Flask(__name__)
 CORS(app)
 
-print('\n Hostname of your Pi: ' + hostname)
-print(' IP address of Pi: ' + ip_address)
+print('\n Hostname: ' + hostname)
 
 @app.route('/Siri/Recipes', methods=['GET'])
 def getRecepies():
@@ -708,4 +705,4 @@ def addIngredient():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=RECIPES_PORT, use_reloader=True)
+    app.run(debug=True, host="0.0.0.0", port=PORT, use_reloader=True)

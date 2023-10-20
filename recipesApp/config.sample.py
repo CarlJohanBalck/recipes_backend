@@ -1,11 +1,9 @@
-IP_ADDRESS = "192.168.0.4"
-PORT = 5001
-RECIPES_PORT = 5002
-KEEP_EMAIL = "carljohanbalck@gmail.com"
-KEEP_PASSWORD = "xxx"
-DB_USER = "root"
-DB_PASSWORD = "root"
-DB_HOST = "db"
+PORT = 5002
+KEEP_EMAIL = "email"
+KEEP_PASSWORD = "password"
+DB_USER = "user"
+DB_PASSWORD = "password"
+DB_HOST = "127.0.0.1"
 DB_PORT = 3306
 DB_DATABASE = "cool_db"
 DB_QUERY_GET_ALL = "SELECT * FROM recipes_view"
@@ -24,3 +22,14 @@ DB_QUERY_ADD_RECIPE_INSTRUCTIONS_NULL = "INSERT INTO recipe (id, name, url, helg
 DB_QUERY_ADD_RECIPE_URL_NULL = "INSERT INTO recipe (id, name, url, helg, image_url, instructions) VALUES(%s,%s,NULL,%s,%s,%s)"
 DB_QUERY_MAX_ID_RECIPE="select MAX(id) from recipe"
 DB_QUERY_MAX_ID_RECIPE_INGREDIENT="select MAX(id) from recipe_ingredient"
+DB_QUERY_GET_INGREDIENT_ID="SELECT id from ingredient where scan_id= "
+
+DB_QUERY_GET_PENTRY="select ingredient.id, ingredient.name, pentry_category.category, pentry_sub_category.sub_category from ingredient join pentry_category join pentry_sub_category where ingredient.id in (select ingredient_id from pentry) and ingredient.pentry_category=pentry_category.id and pentry_sub_category.id=ingredient.pentry_sub_category order by pentry_sub_category.id;"
+
+DB_QUERY_GET_PENTRY_TO_ADD="select ingredient.id, ingredient.name, pentry_category.category from ingredient join pentry_category where ingredient.id in (select id from ingredient) and ingredient.pentry_category=pentry_category.id;"
+
+
+DB_QUERY_GET_NEAR_READY_RECIPES="SELECT * FROM recipes_view r WHERE r.id in (select ri.recipe_id from recipe_ingredient as ri where ri.ingredient_id in (select ingredient_id from pentry) GROUP BY ri.recipe_id HAVING COUNT(*) >= 6);"
+
+
+DB_QUERY_GET_DISH_LIST_REACT_NATIVE = "SELECT * FROM recipe r WHERE r.id in"
