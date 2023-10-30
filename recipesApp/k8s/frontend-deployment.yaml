@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipes-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recipes-frontend
+  template:
+    metadata:
+      labels:
+        app: recipes-frontend
+    spec:
+      containers:
+      - name: recipes-frontend
+        image: carl0222/recipes_frontend_amd64:latest
+        ports:
+        - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recipes-frontend
+spec:
+  selector:
+    app: recipes-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer

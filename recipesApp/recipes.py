@@ -577,7 +577,9 @@ def ReactRecepies():
 		request_data = request.json
 		recipes = request_data.get("idList")
 		keep = gkeepapi.Keep()
-		keep.login(KEEP_EMAIL, KEEP_PASSWORD)
+		print("KEEP EMAIL: ", KEEP_EMAIL)
+		res = keep.login(KEEP_EMAIL, KEEP_PASSWORD)
+		print("Error detail",res.get("ErrorDetail"))
 		
 		try:
 			conn = mariadb.connect(
@@ -701,7 +703,6 @@ def addIngredient():
 
 	return json.dumps(data)
 	
-
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=PORT, use_reloader=True)

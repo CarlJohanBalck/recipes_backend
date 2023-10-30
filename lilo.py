@@ -10,7 +10,6 @@ import configparser
 import calendar
 from sense_hat import SenseHat
 import os
-import mysql.connector as mariadb;
 from decimal import *
 from threading import Thread
 

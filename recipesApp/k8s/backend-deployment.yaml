@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipes-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recipes-backend
+  template:
+    metadata:
+      labels:
+        app: recipes-backend
+    spec:
+      containers:
+      - name: recipes-backend
+        image: carl0222/recipes_backend_amd64:latest
+        ports:
+        - containerPort: 5002  # Adjust the port to match your backend service port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recipes-backend
+spec:
+  selector:
+    app: recipes-backend
+  ports:
+    - protocol: TCP
+      port: 5002  # Should match the backend service port
+      targetPort: 5002  # Should match the backend container port
