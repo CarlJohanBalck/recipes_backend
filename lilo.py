@@ -144,30 +144,6 @@ print(' IP address of Pi: ' + ip_address)
 sense = SenseHat()
 
 
-def indices(lst, item):
-	return [i for i, x in enumerate(lst) if x == item]
-
-def get_data(cursor, recepies):
-	try:
-		statement = "SELECT name, ingredients FROM Recepies WHERE id=%s"
-		ingredientList = []
-		recepieList = []
-		for recepie in recepies:
-			data = (recepie,)
-			cursor.execute(statement, data)
-			for (name, ingredients) in cursor:
-				ingredientList.append(ingredients)
-				recepieList.append(name)
-		return recepieList, ingredientList
-		# for (name) in cursor:
-		# 	print(f"Successfully retrieved {name}")	
-		# 	return {name}
-	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
-
-
-def first2(s):
-	return s[:2]
-
 def getEverySecondDateInFuture(date):
 	parsedDate = datetime.strptime(date, "%d/%m/%Y").date()
 	dateList = []
@@ -179,52 +155,12 @@ def getEverySecondDateInFuture(date):
 	everyOtherDateList = dateList[::2]
 	return everyOtherDateList
 
-
-@app.route('/Siri/LiloStatus', methods=['GET'])
-def LiloStatusSpeech():
-	config = configparser.ConfigParser()
-	config.read('lastDate.ini')
-	now = datetime.now() # current date and time	
-	date_time = now.strftime("%d/%m/%Y")
-	my_date = date.today()
-	weekday = calendar.day_name[my_date.weekday()]
-	last_date = config['DEFAULT']['LAST_DATE']
-	last_date_parsed = last_date.split(" ")[1]
-	futureMedicationDates = getEverySecondDateInFuture(last_date_parsed)
-
-	if(weekday == "Sunday"):
-		veckodag = "Söndag"
-	if(weekday == "Monday"):
-		veckodag = "Måndag"
-	if(weekday == "Tuesday"):
-		veckodag = "Tisdag"
-	if(weekday == "Wednesday"):
-		veckodag = "Onsdag"
-	if(weekday == "Thursday"):
-		veckodag = "Torsdag"
-	if(weekday == "Friday"):
-		veckodag = "Fredag"
-	if(weekday == "Saturday"):
-		veckodag = "Lördag"
-
-	match = veckodag + " " + date_time
-	if (match == config['DEFAULT']['LAST_DATE'] and date_time in futureMedicationDates):
-		return "Idag ska Lilo få medicin, men jag har redan skrivit upp att hon fått medicin idag " + config['DEFAULT']['LAST_DATE']
-		
-	if date_time in futureMedicationDates: 
-		return ('Ja, idag ska Lilo få kortison. Lilo fick kortison senast ') + config['DEFAULT']['LAST_DATE'] + ('...När du gett henne medicinnnnn, säg Lilo fick medicin så skriver jag upp det')
-	else: 
-	
-		return ('Nej, idag ska Lilo inte få kortison. Lilo fick kortison senast ') + config['DEFAULT']['LAST_DATE']
-
-
 def received_medicine(event):
 	if event.action == 'pressed':
 		
 		LiloFick()
 		
 def LiloStatusLight():
-	print("START LILO STATUS LIGHT")
 	config = configparser.ConfigParser()
 	config.read('lastDate.ini')
 	now = datetime.now() # current date and time	
