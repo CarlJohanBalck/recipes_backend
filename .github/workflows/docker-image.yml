@@ -12,4 +12,4 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build -f DailyChores/recipesApp/Dockerfile --tag recipes_backend_amd64:$(date +%s) .
+      run: docker build -f ../../Dockerfile --tag recipes_backend_amd64:$(date +%s) . 
