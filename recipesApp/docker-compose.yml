@@ -2,11 +2,10 @@ version: '3'
 services:
   db:
     container_name: db
-    image: carl0222/recipes_database_amd64:latest
+    image: carl0222/recipes_database_amd64
     ports:
       - "3306:3306"
     restart: always
-      
     volumes:
       - db-data:/var/lib/mysql
     networks: 
@@ -15,8 +14,16 @@ services:
   frontend:
     container_name: frontend
     image: carl0222/recipes_frontend_amd64
-    ports:
+    ports: 
       - "8080:80"
+    restart: always
+    networks: 
+      - recipe_app
+  backend:
+    container_name: backend
+    image: carl0222/recipes_backend_amd64
+    ports:
+      - "5002:5002"
     restart: always
     networks: 
       - recipe_app
