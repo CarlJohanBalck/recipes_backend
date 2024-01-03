@@ -1,7 +1,7 @@
 *.txt
 DishListCal
 config.py
-/recipesApp/config.sh
+recipesApp/config.sh
 __pycache__
 lastDate.ini
 /go_rewrite/dev_config.json
