@@ -1,6 +1,4 @@
 DishListCal
-config.py
-config.sh
 __pycache__
 lastDate.ini
 /go_rewrite/dev_config.json

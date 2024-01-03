@@ -2,7 +2,6 @@ from datetime import datetime
 from flask import Flask, request
 from flask_cors import CORS
 import socket
-import gkeepapi
 import json
 import mysql.connector as mariadb;
 from decimal import *
@@ -10,8 +9,6 @@ from decimal import *
 
 from config import (
 	PORT,
-	KEEP_EMAIL,
-	KEEP_PASSWORD,
 	DB_USER,
 	DB_PASSWORD,
 	DB_HOST,
@@ -102,9 +99,9 @@ def getRecipeIngredients():
 def ReactRecepies():
 		request_data = request.json
 		recipes = request_data.get("idList")
-		keep = gkeepapi.Keep()
-		res = keep.login(KEEP_EMAIL, KEEP_PASSWORD)
-		print("Error detail",res.get("ErrorDetail"))
+		# keep = gkeepapi.Keep()
+		# res = keep.login(KEEP_EMAIL, KEEP_PASSWORD)
+		# print("Error detail",res.get("ErrorDetail"))
 		
 		conn = connectToMariadb()
 		
@@ -129,7 +126,7 @@ def ReactRecepies():
 			dishList.append(newDishList[i])
 			dishList.append("False")
 	
-		dish_list_tuple = [x for x in zip(*[iter(dishList)]*2)]
+		# dish_list_tuple = [x for x in zip(*[iter(dishList)]*2)]
 
 		testList = []
 
@@ -143,24 +140,24 @@ def ReactRecepies():
 		date_time = now.strftime("%d/%m/%Y")	
 
 	
-		gnotes = keep.all()
-		string_ingredients = 'Inköpslista PI - ' + date_time
-		string_dishes = 'Matlista PI - ' + date_time
+		# gnotes = keep.all()
+		# string_ingredients = 'Inköpslista PI - ' + date_time
+		# string_dishes = 'Matlista PI - ' + date_time
 
-		for i in range(len(instructions)):
-			keep.createNote(instructions[i][1], instructions[i][0])
+		# for i in range(len(instructions)):
+		# 	keep.createNote(instructions[i][1], instructions[i][0])
 
-		for i in range(len(gnotes)):
-			if gnotes[i].title == string_ingredients or gnotes[i].title == string_dishes:
-				gnotes[i].delete()
-		keep.createList('Inköpslista PI - ' + date_time, 
-			grocery_list_tuple
-		)
-		keep.createList('Matlista PI - ' + date_time, 
-			dish_list_tuple
-		)
+		# for i in range(len(gnotes)):
+		# 	if gnotes[i].title == string_ingredients or gnotes[i].title == string_dishes:
+		# 		gnotes[i].delete()
+		# keep.createList('Inköpslista PI - ' + date_time, 
+		# 	grocery_list_tuple
+		# )
+		# keep.createList('Matlista PI - ' + date_time, 
+		# 	dish_list_tuple
+		# )
 
-		keep.sync()
+		# keep.sync()
 			
 		return json.dumps(list(grocery_list_tuple))
 
