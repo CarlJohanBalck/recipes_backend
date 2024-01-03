@@ -26,4 +26,4 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: recipes_backend_amd64:latest
+          tags: carl0222/recipes_backend_amd64:latest
