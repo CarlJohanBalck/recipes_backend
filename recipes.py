@@ -112,7 +112,7 @@ def ReactRecepies():
 			dishRow = str(dishes[i][0]) + " " + str(dishes[i][1]).replace('None', '')
 			newDishList.append(dishRow)	
 		print("JSON DUMP: ", list(newGroceryList))
-		
+		global selected_ingredients
 		selected_ingredients = []  # Clear the list
 		selected_ingredients = list(newGroceryList)
 		return json.dumps(list(newGroceryList))
