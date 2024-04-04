@@ -99,67 +99,19 @@ def getRecipeIngredients():
 def ReactRecepies():
 		request_data = request.json
 		recipes = request_data.get("idList")
-		# keep = gkeepapi.Keep()
-		# res = keep.login(KEEP_EMAIL, KEEP_PASSWORD)
-		# print("Error detail",res.get("ErrorDetail"))
-		
 		conn = connectToMariadb()
-		
-		# # Get Cursor
 		cur = conn.cursor()
 		newGroceryList = []
-		
-
 		ingredients = ingredients_for_recipe(cur, recipes)
-		instructions = instructions_for_book_recipes(cur, recipes)
-
 		for i in range (len(ingredients)):
 			groceryRow = str(ingredients[i][0]) + " " + str(ingredients[i][1]).replace('None', '') + " " + str(ingredients[i][2])
 			newGroceryList.append(groceryRow)
 		dishes = dishListForSelectedRecipes(cur, recipes)
-		dishList = []
 		newDishList = []
 		for i in range (len(dishes)):
 			dishRow = str(dishes[i][0]) + " " + str(dishes[i][1]).replace('None', '')
-			newDishList.append(dishRow)
-		for i in range(len(newDishList)):
-			dishList.append(newDishList[i])
-			dishList.append("False")
-	
-		# dish_list_tuple = [x for x in zip(*[iter(dishList)]*2)]
-
-		testList = []
-
-		for i in range(len(newGroceryList)):
-			testList.append(newGroceryList[i])
-			testList.append("False")
-		grocery_list_tuple= [x for x in zip(*[iter(testList)]*2)]
-
-
-		now = datetime.now() # current date and time	
-		date_time = now.strftime("%d/%m/%Y")	
-
-	
-		# gnotes = keep.all()
-		# string_ingredients = 'Inköpslista PI - ' + date_time
-		# string_dishes = 'Matlista PI - ' + date_time
-
-		# for i in range(len(instructions)):
-		# 	keep.createNote(instructions[i][1], instructions[i][0])
-
-		# for i in range(len(gnotes)):
-		# 	if gnotes[i].title == string_ingredients or gnotes[i].title == string_dishes:
-		# 		gnotes[i].delete()
-		# keep.createList('Inköpslista PI - ' + date_time, 
-		# 	grocery_list_tuple
-		# )
-		# keep.createList('Matlista PI - ' + date_time, 
-		# 	dish_list_tuple
-		# )
-
-		# keep.sync()
-			
-		return json.dumps(list(grocery_list_tuple))
+			newDishList.append(dishRow)	
+		return json.dumps(list(newGroceryList))
 
 
 @app.route('/Siri/AddRecipe', methods=['POST'])
@@ -226,6 +178,7 @@ def ingredients_for_recipe(cursor, selectedRecipes):
 
 		for (ingredients) in cursor:
 			ingredientList.append(ingredients)
+		
 		return ingredientList
 	except mariadb.Error as e: print(f"Error retrieving entry from database: {e}")
 

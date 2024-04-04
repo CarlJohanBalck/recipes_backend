@@ -1,7 +1,7 @@
-PORT = 5002
+PORT = 5003
 DB_USER = "root"
 DB_PASSWORD = "root"
-DB_HOST = "db"
+DB_HOST = "localhost"
 DB_PORT = 3306
 DB_DATABASE = "cool_db"
 DB_QUERY_GET_ALL = "SELECT * FROM recipes_view"
