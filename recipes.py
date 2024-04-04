@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import socket
 import json
@@ -111,8 +111,16 @@ def ReactRecepies():
 		for i in range (len(dishes)):
 			dishRow = str(dishes[i][0]) + " " + str(dishes[i][1]).replace('None', '')
 			newDishList.append(dishRow)	
+		print("JSON DUMP: ", list(newGroceryList))
+		
+		selected_ingredients = []  # Clear the list
+		selected_ingredients = list(newGroceryList)
 		return json.dumps(list(newGroceryList))
 
+
+@app.route('/Siri/GetCurrentIngredients', methods=['GET'])
+def GetCurrentIngredients():
+		return jsonify(selected_ingredients)
 
 @app.route('/Siri/AddRecipe', methods=['POST'])
 def addRecipe():
